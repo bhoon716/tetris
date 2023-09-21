@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class Bgm {
     private Clip audioClip;
-    private String audioFilePath = "kr\\ac\\jbnu\\se\\tetris\\bgm.wav";
+    private String audioFilePath = "kr/ac/jbnu/se/tetris/bgm.wav";
     public Bgm() {
         try {
             // 오디오 파일을 로드합니다.
