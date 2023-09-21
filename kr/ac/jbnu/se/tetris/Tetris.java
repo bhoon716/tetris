@@ -30,5 +30,8 @@ public class Tetris extends JFrame {
 		Tetris game = new Tetris();
 		game.setLocationRelativeTo(null); // 프레임을 화면의 가운데에 배치
 		game.setVisible(true); // 프레임을 화면에 표시
+
+		Bgm bgm = new Bgm(); // 배경음악 재생
+		bgm.start();
 	}
 }
