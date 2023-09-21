@@ -17,6 +17,8 @@ public class Board extends JPanel implements ActionListener {
 	final int BoardWidth = 10; //게임 보드의 가로 칸 수
 	final int BoardHeight = 22; //게임 보드의 세로 칸 수
 
+	Bgm bgm = new Bgm();
+
 	Timer timer; //게임의 속도를 조절하는 타이머
 	boolean isFallingFinished = false; //블록이 떨어지는 것이 끝났는지를 나타내는 변수
 	boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
@@ -33,6 +35,7 @@ public class Board extends JPanel implements ActionListener {
 		setFocusable(true); //키보드 입력을 받을 수 있도록 설정
 		curPiece = new Shape(); //새로운 블록을 생성
 		timer = new Timer(400, this); //타이머 생성(400ms마다 actionPerformed()를 호출)
+		bgm.start();
 		timer.start(); //타이머 시작
 
 		statusbar = parent.getStatusBar(); //게임의 상태를 나타내는 레이블을 가져옴
@@ -83,9 +86,11 @@ public class Board extends JPanel implements ActionListener {
 		if (isPaused) { //게임이 일시정지되었다면
 			timer.stop(); //타이머 정지
 			statusbar.setText("paused"); //게임의 상태를 나타내는 레이블에 "paused"를 출력
+			bgm.stop();
 		} else { //게임이 일시정지되지 않았다면
 			timer.start(); //타이머 시작
 			statusbar.setText(String.valueOf(numLinesRemoved)); //게임의 상태를 나타내는 레이블에 제거된 줄의 수를 출력
+			bgm.start();
 		}
 		repaint(); //게임 보드를 다시 그림
 	}
@@ -104,12 +109,12 @@ public class Board extends JPanel implements ActionListener {
 			}
 		}
 
-		if (curPiece.getShape() != Tetrominoes.NoShape) { //현재 블록의 모양이 NoShape(없음)이 아니라면
-			for (int i = 0; i < 4; ++i) { //현재 블록의 모든 칸에 대해
-				int x = curX + curPiece.x(i); //현재 블록의 x좌표
-				int y = curY - curPiece.y(i); //현재 블록의 y좌표
-				drawSquare(g, 0 + x * squareWidth(), boardTop + (BoardHeight - y - 1) * squareHeight(), 
-						curPiece.getShape()); //현재 블록을 그림
+		if (curPiece.getShape() != Tetrominoes.NoShape) { //현재 블럭의 모양이 NoShape(없음)이 아니라면
+			for (int i = 0; i < 4; ++i) { //현재 블럭의 모든 칸에 대해
+				int x = curX + curPiece.x(i); //현재 블럭의 x좌표
+				int y = curY - curPiece.y(i); //현재 블럭의 y좌표
+				drawSquare(g, 0 + x * squareWidth(), boardTop + (BoardHeight - y - 1) * squareHeight(),
+						curPiece.getShape()); //현재 블럭을 그림
 			}
 		}
 	}
@@ -157,6 +162,7 @@ public class Board extends JPanel implements ActionListener {
 			timer.stop(); //타이머 정지
 			isStarted = false; //게임이 시작되었음을 나타내는 변수를 false로 설정
 			statusbar.setText("game over"); //게임의 상태를 나타내는 레이블에 "game over"를 출력
+			bgm.stop();
 		}
 	}
 
@@ -245,27 +251,27 @@ public class Board extends JPanel implements ActionListener {
 				return;
 
 			switch (keycode) { //키보드 입력에 따른 블록 제어 결정
-			case KeyEvent.VK_LEFT:
-				tryMove(curPiece, curX - 1, curY);
-				break; //X좌표 값 1 감소, 왼쪽으로 한 칸 이동 (왼쪽 화살표)
-			case KeyEvent.VK_RIGHT:
-				tryMove(curPiece, curX + 1, curY);
-				break; //X좌표 값 1 증가, 오른쪽으로 한 칸 이동 (오른쪽 화살표)
-			case KeyEvent.VK_DOWN:
-				tryMove(curPiece.rotateRight(), curX, curY);
-				break; //시계 방향 회전 (아래쪽 화살표)
-			case KeyEvent.VK_UP:
-				tryMove(curPiece.rotateLeft(), curX, curY);
-				break; //반시계 방향 회전 (위쪽 화살표)
-			case KeyEvent.VK_SPACE:
-				dropDown();
-				break; //하드 드롭 (Space)
-			case 'd':
-				oneLineDown();
-				break; //소프트 드롭 (d)
-			case 'D':
-				oneLineDown();
-				break; //소프트 드롭 (D)
+				case KeyEvent.VK_LEFT:
+					tryMove(curPiece, curX - 1, curY);
+					break; //X좌표 값 1 감소, 왼쪽으로 한 칸 이동 (왼쪽 화살표)
+				case KeyEvent.VK_RIGHT:
+					tryMove(curPiece, curX + 1, curY);
+					break; //X좌표 값 1 증가, 오른쪽으로 한 칸 이동 (오른쪽 화살표)
+				case KeyEvent.VK_DOWN:
+					tryMove(curPiece.rotateRight(), curX, curY);
+					break; //시계 방향 회전 (아래쪽 화살표)
+				case KeyEvent.VK_UP:
+					tryMove(curPiece.rotateLeft(), curX, curY);
+					break; //반시계 방향 회전 (위쪽 화살표)
+				case KeyEvent.VK_SPACE:
+					dropDown();
+					break; //하드 드롭 (Space)
+				case 'd':
+					oneLineDown();
+					break; //소프트 드롭 (d)
+				case 'D':
+					oneLineDown();
+					break; //소프트 드롭 (D)
 			}
 		}
 	}
