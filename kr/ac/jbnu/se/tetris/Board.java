@@ -238,34 +238,34 @@ public class Board extends JPanel implements ActionListener {
 
 			if (keycode == 'p' || keycode == 'P') {
 				pause();
-				return;
+				return; //게임 일시정지 (p or P)
 			}
 
 			if (isPaused)
 				return;
 
-			switch (keycode) {
+			switch (keycode) { //키보드 입력에 따른 블록 제어 결정
 			case KeyEvent.VK_LEFT:
 				tryMove(curPiece, curX - 1, curY);
-				break;
+				break; //X좌표 값 1 감소, 왼쪽으로 한 칸 이동 (왼쪽 화살표)
 			case KeyEvent.VK_RIGHT:
 				tryMove(curPiece, curX + 1, curY);
-				break;
+				break; //X좌표 값 1 증가, 오른쪽으로 한 칸 이동 (오른쪽 화살표)
 			case KeyEvent.VK_DOWN:
 				tryMove(curPiece.rotateRight(), curX, curY);
-				break;
+				break; //시계 방향 회전 (아래쪽 화살표)
 			case KeyEvent.VK_UP:
 				tryMove(curPiece.rotateLeft(), curX, curY);
-				break;
+				break; //반시계 방향 회전 (위쪽 화살표)
 			case KeyEvent.VK_SPACE:
 				dropDown();
-				break;
+				break; //하드 드롭 (Space)
 			case 'd':
 				oneLineDown();
-				break;
+				break; //소프트 드롭 (d)
 			case 'D':
 				oneLineDown();
-				break;
+				break; //소프트 드롭 (D)
 			}
 		}
 	}
