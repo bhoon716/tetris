@@ -29,7 +29,7 @@ public class Bgm {
         }
     }
 
-    public void start() {
+    public void play() {
         // 배경 음악 재생을 시작합니다.
         audioClip.start();
     }
@@ -37,5 +37,11 @@ public class Bgm {
     public void stop() {
         // 배경 음악 재생을 중지합니다.
         audioClip.stop();
+    }
+
+    public void replay() {
+        // 배경 음악을 처음부터 다시 재생합니다.
+        audioClip.setFramePosition(0);
+        audioClip.start();
     }
 }
