@@ -1,5 +1,6 @@
 package kr.ac.jbnu.se.tetris;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -17,7 +18,7 @@ public class Board extends JPanel implements ActionListener {
 	final int BoardWidth = 10; //게임 보드의 가로 칸 수
 	final int BoardHeight = 22; //게임 보드의 세로 칸 수
 
-	Bgm bgm = new Bgm();
+	Bgm bgm = new Bgm(); //배경음악 객체
 
 	Timer timer; //게임의 속도를 조절하는 타이머
 	boolean isFallingFinished = false; //블록이 떨어지는 것이 끝났는지를 나타내는 변수
@@ -30,18 +31,22 @@ public class Board extends JPanel implements ActionListener {
 	Shape curPiece; //현재 블록을 나타내는 객체
 	Tetrominoes[] board; //게임 보드를 나타내는 배열
 
+
+	
+
 	public Board(Tetris parent) {
 
 		setFocusable(true); //키보드 입력을 받을 수 있도록 설정
 		curPiece = new Shape(); //새로운 블록을 생성
 		timer = new Timer(400, this); //타이머 생성(400ms마다 actionPerformed()를 호출)
-		bgm.start();
+		bgm.play();
 		timer.start(); //타이머 시작
 
-		statusbar = parent.getStatusBar(); //게임의 상태를 나타내는 레이블을 가져옴
 		board = new Tetrominoes[BoardWidth * BoardHeight]; //게임 보드를 나타내는 배열 생성
 		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
 		clearBoard(); //게임 보드를 초기화
+		statusbar = new JLabel(String.valueOf(numLinesRemoved)); // 게임의 상태를 나타내는 레이블을 생성
+		add(statusbar, BorderLayout.SOUTH); // 레이블을 프레임의 아래쪽에 추가
 	}
 
 	public void actionPerformed(ActionEvent e) { //타이머가 400ms마다 호출하는 메소드
@@ -73,7 +78,7 @@ public class Board extends JPanel implements ActionListener {
 		isFallingFinished = false; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 false로 설정
 		numLinesRemoved = 0; //제거된 줄의 수를 0으로 설정
 		clearBoard(); //게임 보드를 초기화
-
+		statusbar.setText(String.valueOf(numLinesRemoved));
 		newPiece(); //새로운 블록을 생성
 		timer.start(); //타이머 시작
 	}
@@ -90,9 +95,15 @@ public class Board extends JPanel implements ActionListener {
 		} else { //게임이 일시정지되지 않았다면
 			timer.start(); //타이머 시작
 			statusbar.setText(String.valueOf(numLinesRemoved)); //게임의 상태를 나타내는 레이블에 제거된 줄의 수를 출력
-			bgm.start();
+			bgm.play();
 		}
 		repaint(); //게임 보드를 다시 그림
+	}
+	
+	private void restart(){
+		bgm.stop();
+		start();
+		bgm.replay();
 	}
 
 	public void paint(Graphics g) { //게임 보드를 그리는 메소드
@@ -233,6 +244,7 @@ public class Board extends JPanel implements ActionListener {
 		g.drawLine(x + squareWidth() - 1, y + squareHeight() - 1, x + squareWidth() - 1, y + 1); //블록의 오른쪽에 어두운 선을 그림
 	}
 
+
 	class TAdapter extends KeyAdapter { //키보드 입력을 받는 클래스
 		public void keyPressed(KeyEvent e) {
 
@@ -272,6 +284,12 @@ public class Board extends JPanel implements ActionListener {
 				case 'D':
 					oneLineDown();
 					break; //소프트 드롭 (D)
+				case 'r':
+					restart();
+					break; //게임 재시작 (r)
+				case 'R':
+					restart();
+					break; //게임 재시작 (R)
 			}
 		}
 	}
