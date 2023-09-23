@@ -2,7 +2,6 @@ package kr.ac.jbnu.se.tetris;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,7 +20,7 @@ public class Board extends JPanel implements ActionListener {
 	Bgm bgm = new Bgm(); //배경음악 객체
 
 	Timer timer; //게임의 속도를 조절하는 타이머
-	boolean isFallingFinished = false; //블록이 떨어지는 것이 끝났는지를 나타내는 변수
+	boolean isFallingFinished = false; //현재 블록이 다 떨어졌는지 확인하는 변수
 	boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
 	boolean isPaused = false; //게임이 일시정지되었는지를 나타내는 변수
 	int numLinesRemoved = 0; //제거된 줄의 수를 나타내는 변수
@@ -30,9 +29,7 @@ public class Board extends JPanel implements ActionListener {
 	JLabel statusbar; //게임의 상태를 나타내는 레이블(시작, 일시정지, 게임오버, 스코어 등)
 	Shape curPiece; //현재 블록을 나타내는 객체
 	Tetrominoes[] board; //게임 보드를 나타내는 배열
-
-
-	
+	int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
 
 	public Board(Tetris parent) {
 
@@ -108,9 +105,7 @@ public class Board extends JPanel implements ActionListener {
 
 	public void paint(Graphics g) { //게임 보드를 그리는 메소드
 		super.paint(g); //부모 클래스의 paint()를 호출
-
-		Dimension size = getSize(); //그래픽의 요소의 폭과 높이를 나타내는 클래스
-		int boardTop = (int) size.getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
+		drawBackground(g);
 
 		for (int i = 0; i < BoardHeight; ++i) {
 			for (int j = 0; j < BoardWidth; ++j) { //게임 보드의 모든 칸에 대해
@@ -244,6 +239,19 @@ public class Board extends JPanel implements ActionListener {
 		g.drawLine(x + squareWidth() - 1, y + squareHeight() - 1, x + squareWidth() - 1, y + 1); //블록의 오른쪽에 어두운 선을 그림
 	}
 
+	private void drawBackground(Graphics g) { //배경 격자를 그리는 메소드
+		g.setColor(new Color(170, 170, 170)); //회색으로 설정
+
+		// 가로선 그리기
+		for (int y = 0; y <= BoardHeight * squareHeight(); y += squareHeight()) {
+			g.drawLine(0, boardTop+y, BoardWidth * squareWidth(), boardTop + y);
+		}
+
+		// 세로선 그리기
+		for (int x = 0; x <= BoardWidth * squareWidth(); x += squareWidth()) {
+			g.drawLine(x, 0, x, BoardHeight * squareHeight());
+		}
+	}
 
 	class TAdapter extends KeyAdapter { //키보드 입력을 받는 클래스
 		public void keyPressed(KeyEvent e) {
