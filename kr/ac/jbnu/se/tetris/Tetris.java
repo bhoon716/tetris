@@ -3,9 +3,7 @@ package kr.ac.jbnu.se.tetris;
 import javax.swing.JFrame;
 
 public class Tetris extends JFrame {
-
 	public Tetris() {
-
 		Board board = new Board(this); // Board : 테트리스 게임 로직 및 그래픽
 		add(board); // Board를 프레임에 추가
 		board.start(); // 게임 시작
