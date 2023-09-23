@@ -97,10 +97,9 @@ public class Board extends JPanel implements ActionListener {
 		repaint(); //게임 보드를 다시 그림
 	}
 	
-	private void restart(){
-		bgm.stop();
-		start();
+	private void restart(){ //게임을 재시작하는 메소드
 		bgm.replay();
+		start();
 	}
 
 	public void paint(Graphics g) { //게임 보드를 그리는 메소드
@@ -253,52 +252,45 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
 
-	class TAdapter extends KeyAdapter { //키보드 입력을 받는 클래스
+	class TAdapter extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
-
-			if (!isStarted || curPiece.getShape() == Tetrominoes.NoShape) { //게임이 시작되지 않았거나 현재 블록의 모양이 NoShape(없음)이라면
-				return; //메소드 종료
-			}
-
-			int keycode = e.getKeyCode(); //키보드의 키 코드를 가져옴
-
+			int keycode = e.getKeyCode();
+	
 			if (keycode == 'p' || keycode == 'P') {
 				pause();
-				return; //게임 일시정지 (p or P)
+				return;
+			}
+	
+			if (isPaused) {
+				return;
 			}
 
-			if (isPaused)
-				return;
-
-			switch (keycode) { //키보드 입력에 따른 블록 제어 결정
+			switch (keycode) {
 				case KeyEvent.VK_LEFT:
 					tryMove(curPiece, curX - 1, curY);
-					break; //X좌표 값 1 감소, 왼쪽으로 한 칸 이동 (왼쪽 화살표)
+					break; // 왼쪽으로 이동 (왼쪽 화살표)
 				case KeyEvent.VK_RIGHT:
 					tryMove(curPiece, curX + 1, curY);
-					break; //X좌표 값 1 증가, 오른쪽으로 한 칸 이동 (오른쪽 화살표)
+					break; // 오른쪽으로 이동 (오른쪽 화살표)
 				case KeyEvent.VK_DOWN:
 					tryMove(curPiece.rotateRight(), curX, curY);
-					break; //시계 방향 회전 (아래쪽 화살표)
+					break; // 시계 방향 회전 (아래쪽 화살표)
 				case KeyEvent.VK_UP:
 					tryMove(curPiece.rotateLeft(), curX, curY);
-					break; //반시계 방향 회전 (위쪽 화살표)
+					break; // 반시계 방향 회전 (위쪽 화살표)
 				case KeyEvent.VK_SPACE:
 					dropDown();
-					break; //하드 드롭 (Space)
+					break; // 하드 드롭 (Space)
 				case 'd':
-					oneLineDown();
-					break; //소프트 드롭 (d)
 				case 'D':
 					oneLineDown();
-					break; //소프트 드롭 (D)
+					break; // 소프트 드롭 (D)
 				case 'r':
-					restart();
-					break; //게임 재시작 (r)
 				case 'R':
 					restart();
-					break; //게임 재시작 (R)
+					break; // 게임 재시작 (R)
 			}
 		}
 	}
+		
 }
