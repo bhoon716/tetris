@@ -26,6 +26,7 @@ public class Board extends JPanel implements ActionListener {
 	int numLinesRemoved = 0; //제거된 줄의 수를 나타내는 변수
 	int curX = 0; //현재 블록의 x좌표
 	int curY = 0; //현재 블록의 y좌표
+	int ghostY = 0; //현재 블록의 고스트 블록의 y좌표
 	JLabel statusbar; //게임의 상태를 나타내는 레이블(시작, 일시정지, 게임오버, 스코어 등)
 	Shape curPiece; //현재 블록을 나타내는 객체
 	Tetrominoes[] board; //게임 보드를 나타내는 배열
@@ -36,7 +37,7 @@ public class Board extends JPanel implements ActionListener {
 		setFocusable(true); //키보드 입력을 받을 수 있도록 설정
 		curPiece = new Shape(); //새로운 블록을 생성
 		timer = new Timer(400, this); //타이머 생성(400ms마다 actionPerformed()를 호출)
-		bgm.play();
+		bgm.play(); //배경음악 재생
 		timer.start(); //타이머 시작
 
 		board = new Tetrominoes[BoardWidth * BoardHeight]; //게임 보드를 나타내는 배열 생성
@@ -44,6 +45,20 @@ public class Board extends JPanel implements ActionListener {
 		clearBoard(); //게임 보드를 초기화
 		statusbar = new JLabel(String.valueOf(numLinesRemoved)); // 게임의 상태를 나타내는 레이블을 생성
 		add(statusbar, BorderLayout.SOUTH); // 레이블을 프레임의 아래쪽에 추가
+	}
+
+	private void drawGhost(Graphics g, int curX, int curY, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
+		int newY = curY;
+		while(newY > 0){
+			if(!ghostTryMove(curPiece, curX, newY-1))
+				break;
+			--newY;
+		}
+		for(int i=0; i<4; ++i){
+			int x = curX + curPiece.x(i);
+			int y = newY - curPiece.y(i);
+			g.fillRect(0 + x * squareWidth(), boardTop + (BoardHeight - y - 1) * squareHeight(), squareWidth(), squareHeight());
+		}
 	}
 
 	public void actionPerformed(ActionEvent e) { //타이머가 400ms마다 호출하는 메소드
@@ -105,7 +120,7 @@ public class Board extends JPanel implements ActionListener {
 	public void paint(Graphics g) { //게임 보드를 그리는 메소드
 		super.paint(g); //부모 클래스의 paint()를 호출
 		drawBackground(g);
-
+		drawGhost(g, curX, curY, curPiece.getShape());
 		for (int i = 0; i < BoardHeight; ++i) {
 			for (int j = 0; j < BoardWidth; ++j) { //게임 보드의 모든 칸에 대해
 				Tetrominoes shape = shapeAt(j, BoardHeight - i - 1); //게임 보드의 (j, BoardHeight - i - 1) 위치에 있는 블록의 모양을 가져옴
@@ -126,7 +141,7 @@ public class Board extends JPanel implements ActionListener {
 
 	private void dropDown() { //블록을 한 칸 아래로 이동하는 메소드
 		int newY = curY; //현재 블록의 y좌표를 저장
-		while (newY > 0) { //현재 블록의 y좌표가 0보다 크다면 반복
+		while (newY > 0) { //현재 블록의 y좌표가 0보다 작아질 때까지 반복
 			if (!tryMove(curPiece, curX, newY - 1)) //블록을 한 칸 아래로 이동할 수 없다면
 				break; //반복문 종료
 			--newY; //현재 블록의 y좌표를 1만큼 감소
@@ -177,7 +192,7 @@ public class Board extends JPanel implements ActionListener {
 			int y = newY - newPiece.y(i); //새로운 블록의 y좌표
 			if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) //새로운 블록이 게임 보드의 범위를 벗어난다면
 				return false; //false 반환
-			if (shapeAt(x, y) != Tetrominoes.NoShape) //새로운 블록이 게임 보드의 다른 블록과 겹친다면
+			if (shapeAt(x, y) != Tetrominoes.NoShape) //새로운 블록이 게임 보드의 다른 블록과 겹친다면 = 새로운 x, y에 블록이 존재한다면
 				return false; //false 반환
 		}
 
@@ -186,6 +201,19 @@ public class Board extends JPanel implements ActionListener {
 		curY = newY; //현재 블록의 y좌표를 newY로 설정
 		repaint(); //게임 보드를 다시 그림
 		return true; //true 반환
+	}
+
+	private boolean ghostTryMove(Shape newPiece, int newX, int newY){
+		for(int i=0; i<4; ++i){
+			int x = newX + newPiece.x(i); //새로운 블록의 x좌표
+			int y = newY - newPiece.y(i); //새로운 블록의 y좌표
+			if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) //새로운 블록이 게임 보드의 범위를 벗어난다면
+				return false; //false 반환
+			if (shapeAt(x, y) != Tetrominoes.NoShape) //새로운 블록이 게임 보드의 다른 블록과 겹친다면 = 새로운 x, y에 블록이 존재한다면
+				return false; //false 반환
+		}
+		repaint();
+		return true;
 	}
 
 	private void removeFullLines() { //블록을 내리고 가득 찬 줄이 있으면 제거하는 메소드
