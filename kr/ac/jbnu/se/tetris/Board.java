@@ -182,7 +182,7 @@ public class Board extends JPanel implements ActionListener {
 			timer.stop(); //타이머 정지
 			isStarted = false; //게임이 시작되었음을 나타내는 변수를 false로 설정
 			statusbar.setText("game over"); //게임의 상태를 나타내는 레이블에 "game over"를 출력
-			bgm.stop();
+			bgm.stop(); //배경음악 정지
 		}
 	}
 
