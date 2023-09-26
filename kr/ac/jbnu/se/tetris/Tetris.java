@@ -1,7 +1,6 @@
 package kr.ac.jbnu.se.tetris;
 
 import javax.swing.JFrame;
-import java.net.URL;
 
 public class Tetris extends JFrame {
 	public Tetris() {
