@@ -46,8 +46,10 @@ public class Board extends JPanel implements ActionListener {
 		board = new Tetrominoes[BoardWidth * BoardHeight]; //게임 보드를 나타내는 배열 생성
 		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
 		clearBoard(); //게임 보드를 초기화
-		statusbar = new JLabel(String.valueOf(numLinesRemoved)); // 게임의 상태를 나타내는 레이블을 생성
-		add(statusbar, BorderLayout.SOUTH); // 레이블을 프레임의 아래쪽에 추가
+		statusbar = new JLabel(String.valueOf(numLinesRemoved)); //
+		statusbar.setHorizontalAlignment(SwingConstants.CENTER);// 게임의 상태를 나타내는 레이블을 생성
+		parent.setLayout(new BorderLayout());
+		parent.add(statusbar, BorderLayout.SOUTH);
 	}
 
 	private void drawGhost(Graphics g, int curX, int curY, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
@@ -114,7 +116,7 @@ public class Board extends JPanel implements ActionListener {
 		}
 		repaint(); //게임 보드를 다시 그림
 	}
-	
+
 	private void restart(){ //게임을 재시작하는 메소드
 		bgm.replay();
 		start();
@@ -294,12 +296,12 @@ public class Board extends JPanel implements ActionListener {
 	class TAdapter extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
 			int keycode = e.getKeyCode();
-	
+
 			if (keycode == 'p' || keycode == 'P') {
 				pause();
 				return;
 			}
-	
+
 			if (isPaused) {
 				return;
 			}
@@ -331,5 +333,5 @@ public class Board extends JPanel implements ActionListener {
 			}
 		}
 	}
-		
+
 }
