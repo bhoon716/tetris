@@ -7,10 +7,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.Toolkit;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.Timer;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -119,6 +122,7 @@ public class Board extends JPanel implements ActionListener {
 
 	public void paint(Graphics g) { //게임 보드를 그리는 메소드
 		super.paint(g); //부모 클래스의 paint()를 호출
+		addBkgImg(g); // 이미지 위에 격자가 그려질 수 있도록 이미지를 먼저 그리고 격자를 그림
 		drawBackground(g);
 		drawGhost(g, curX, curY, curPiece.getShape());
 		for (int i = 0; i < BoardHeight; ++i) {
@@ -266,19 +270,26 @@ public class Board extends JPanel implements ActionListener {
 		g.drawLine(x + squareWidth() - 1, y + squareHeight() - 1, x + squareWidth() - 1, y + 1); //블록의 오른쪽에 어두운 선을 그림
 	}
 
-	private void drawBackground(Graphics g) { //배경 격자를 그리는 메소드
-		g.setColor(new Color(170, 170, 170)); //회색으로 설정
+	private void addBkgImg(Graphics g) {
+		ImageIcon bkgImg = new ImageIcon("kr/ac/jbnu/se/tetris/image/background.jpg");
+		Image bkgImg1 = bkgImg.getImage();
+		g.drawImage(bkgImg1, 0, 0, getWidth(), getHeight(), this);
+	}
 
+	private void drawBackground(Graphics g) { //격자를 그리는 메소드
 		// 가로선 그리기
 		for (int y = 0; y <= BoardHeight * squareHeight(); y += squareHeight()) {
-			g.drawLine(0, boardTop+y, BoardWidth * squareWidth(), boardTop + y);
+			g.setColor(Color.LIGHT_GRAY); // 격자 선 색상 설정
+			g.drawLine(0, boardTop + y, BoardWidth * squareWidth(), boardTop + y);
 		}
 
 		// 세로선 그리기
 		for (int x = 0; x <= BoardWidth * squareWidth(); x += squareWidth()) {
+			g.setColor(Color.LIGHT_GRAY); // 격자 선 색상 설정
 			g.drawLine(x, 0, x, BoardHeight * squareHeight());
 		}
 	}
+
 
 	class TAdapter extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
