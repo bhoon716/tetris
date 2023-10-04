@@ -1,55 +1,58 @@
 package kr.ac.jbnu.se.tetris;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.Toolkit;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
+import java.awt.event.*;
 import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
+	Tetris tetris;
 
 	final int BoardWidth = 10; //게임 보드의 가로 칸 수
 	final int BoardHeight = 22; //게임 보드의 세로 칸 수
 
 	Bgm bgm = new Bgm(); //배경음악 객체
+	
+	private Timer timer; //게임의 속도를 조절하는 타이머
+	private boolean isFallingFinished = false; //현재 블록이 다 떨어졌는지 확인하는 변수
+	private boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
+	private boolean isPaused = false; //게임이 일시정지되었는지를 나타내는 변수
+	private int numLinesRemoved = 0; //제거된 줄의 수를 나타내는 변수
+	private int curX = 0; //현재 블록의 x좌표
+	private int curY = 0; //현재 블록의 y좌표
+	private Shape curPiece; //현재 블록을 나타내는 객체
+	private Tetrominoes[] board; //게임 보드를 나타내는 배열
+	private int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
 
-	Timer timer; //게임의 속도를 조절하는 타이머
-	boolean isFallingFinished = false; //현재 블록이 다 떨어졌는지 확인하는 변수
-	boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
-	boolean isPaused = false; //게임이 일시정지되었는지를 나타내는 변수
-	int numLinesRemoved = 0; //제거된 줄의 수를 나타내는 변수
-	int curX = 0; //현재 블록의 x좌표
-	int curY = 0; //현재 블록의 y좌표
-	int ghostY = 0; //현재 블록의 고스트 블록의 y좌표
-	JLabel statusbar; //게임의 상태를 나타내는 레이블(시작, 일시정지, 게임오버, 스코어 등)
-	Shape curPiece; //현재 블록을 나타내는 객체
-	Tetrominoes[] board; //게임 보드를 나타내는 배열
-	int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
+	private int score = 0;
+	private String status = "Start";
+	private JLabel scoreLabel = new JLabel("Score : " + score);
+	private JLabel statusLabel = new JLabel("Status : " + status);
+	private JPanel statusPanel = new JPanel();
+	private JPanel nextBlockPanel = new JPanel();
+	private JPanel savePanel = new JPanel();
 
-	public Board(Tetris parent) {
+	
+	public Board(Tetris tetris) {
+		this.tetris = tetris;
+		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
+		setPreferredSize(new Dimension(250, 400));
 
-		setFocusable(true); //키보드 입력을 받을 수 있도록 설정
 		curPiece = new Shape(); //새로운 블록을 생성
 		timer = new Timer(400, this); //타이머 생성(400ms마다 actionPerformed()를 호출)
 		bgm.play(); //배경음악 재생
 		timer.start(); //타이머 시작
-
 		board = new Tetrominoes[BoardWidth * BoardHeight]; //게임 보드를 나타내는 배열 생성
-		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
 		clearBoard(); //게임 보드를 초기화
-		statusbar = new JLabel(String.valueOf(numLinesRemoved)); //
-		statusbar.setHorizontalAlignment(SwingConstants.CENTER);// 게임의 상태를 나타내는 레이블을 생성
-		parent.setLayout(new BorderLayout());
-		parent.add(statusbar, BorderLayout.SOUTH);
+		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
+		start();
+
+		JPanel scorePanel = new JPanel();
+		scorePanel.setPreferredSize(new Dimension(190, 400));
+		scorePanel.setLayout(new BorderLayout());
+		scorePanel.setBackground(Color.GRAY);
+		add(scorePanel, BorderLayout.EAST);
+		scorePanel.add(scoreLabel, BorderLayout.NORTH);
+		scorePanel.add(statusLabel);
 	}
 
 	private void drawGhost(Graphics g, int curX, int curY, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
@@ -66,6 +69,7 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) { //타이머가 400ms마다 호출하는 메소드
 		if (isFallingFinished) { //블록이 떨어지는 것이 끝났다면
 			isFallingFinished = false; //끝났음을 나타내는 변수를 false로 설정
@@ -75,15 +79,15 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
 
-	int squareWidth() {
-		return (int) getSize().getWidth() / BoardWidth; //게임 보드의 가로 공간을 BoardWidth로 나눈 값(한 칸의 가로 길이)
+	private int squareWidth() {
+		return (int) getSize().getWidth() / BoardWidth / 2; //게임 보드의 가로 공간을 BoardWidth로 나눈 값(한 칸의 가로 길이)
 	}
 
-	int squareHeight() {
+	private int squareHeight() {
 		return (int) getSize().getHeight() / BoardHeight; //게임 보드의 세로 공간을 BoardHeight로 나눈 값(한 칸의 세로 길이)
 	}
 
-	Tetrominoes shapeAt(int x, int y) {
+	private Tetrominoes shapeAt(int x, int y) {
 		return board[(y * BoardWidth) + x]; //게임 보드의 (x, y) 위치에 있는 블록의 모양을 반환
 	}
 
@@ -95,7 +99,7 @@ public class Board extends JPanel implements ActionListener {
 		isFallingFinished = false; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 false로 설정
 		numLinesRemoved = 0; //제거된 줄의 수를 0으로 설정
 		clearBoard(); //게임 보드를 초기화
-		statusbar.setText(String.valueOf(numLinesRemoved));
+
 		newPiece(); //새로운 블록을 생성
 		timer.start(); //타이머 시작
 	}
@@ -107,11 +111,11 @@ public class Board extends JPanel implements ActionListener {
 		isPaused = !isPaused; //게임이 일시정지되었음을 나타내는 변수를 반전
 		if (isPaused) { //게임이 일시정지되었다면
 			timer.stop(); //타이머 정지
-			statusbar.setText("paused"); //게임의 상태를 나타내는 레이블에 "paused"를 출력
+			// statusbar.setText("paused"); //게임의 상태를 나타내는 레이블에 "paused"를 출력
 			bgm.stop();
 		} else { //게임이 일시정지되지 않았다면
 			timer.start(); //타이머 시작
-			statusbar.setText(String.valueOf(numLinesRemoved)); //게임의 상태를 나타내는 레이블에 제거된 줄의 수를 출력
+			// statusbar.setText(String.valueOf(numLinesRemoved)); //게임의 상태를 나타내는 레이블에 제거된 줄의 수를 출력
 			bgm.play();
 		}
 		repaint(); //게임 보드를 다시 그림
@@ -160,7 +164,7 @@ public class Board extends JPanel implements ActionListener {
 			pieceDropped(); //블록을 한 칸 아래로 이동
 	}
 
-	private void clearBoard() { //게임 보드를 초기화하는 메소드
+	private void clearBoard() { //게임 보드를 초기화하는 메소드s
 		for (int i = 0; i < BoardHeight * BoardWidth; ++i) //게임 보드의 모든 칸에 대해
 			board[i] = Tetrominoes.NoShape; //칸의 모양을 NoShape(없음)으로 설정
 	}
@@ -187,7 +191,7 @@ public class Board extends JPanel implements ActionListener {
 			curPiece.setShape(Tetrominoes.NoShape); //현재 블록의 모양을 NoShape(없음)으로 설정
 			timer.stop(); //타이머 정지
 			isStarted = false; //게임이 시작되었음을 나타내는 변수를 false로 설정
-			statusbar.setText("game over"); //게임의 상태를 나타내는 레이블에 "game over"를 출력
+			// statusbar.setText("game over"); //게임의 상태를 나타내는 레이블에 "game over"를 출력
 			bgm.stop(); //배경음악 정지
 		}
 	}
@@ -196,6 +200,10 @@ public class Board extends JPanel implements ActionListener {
 		for (int i = 0; i < 4; ++i) { //새로운 블록의 모든 칸에 대해
 			int x = newX + newPiece.x(i); //새로운 블록의 x좌표
 			int y = newY - newPiece.y(i); //새로운 블록의 y좌표
+			if((x < 0) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 왼쪽 벽을 넘어간다면
+				tryMove(newPiece, newX+1, newY); //새로운 블록을 오른쪽으로 한 칸 이동
+			if((x >= BoardWidth) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 오른쪽 벽을 넘어간다면
+				tryMove(newPiece, newX-1, newY); //새로운 블록을 왼쪽으로 한 칸 이동
 			if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) //새로운 블록이 게임 보드의 범위를 벗어난다면
 				return false; //false 반환
 			if (shapeAt(x, y) != Tetrominoes.NoShape) //새로운 블록이 게임 보드의 다른 블록과 겹친다면 = 새로운 x, y에 블록이 존재한다면
@@ -246,7 +254,7 @@ public class Board extends JPanel implements ActionListener {
 
 		if (numFullLines > 0) { //가득 찬 줄이 있다면
 			numLinesRemoved += numFullLines; //제거된 줄의 수를 증가
-			statusbar.setText(String.valueOf(numLinesRemoved)); //게임의 상태를 나타내는 레이블에 제거된 줄의 수를 출력
+			// statusbar.setText(String.valueOf(numLinesRemoved)); //게임의 상태를 나타내는 레이블에 제거된 줄의 수를 출력
 			isFallingFinished = true; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 true로 설정
 			curPiece.setShape(Tetrominoes.NoShape); //현재 블록의 모양을 NoShape(없음)으로 설정
 			repaint(); //게임 보드를 다시 그림
@@ -275,7 +283,7 @@ public class Board extends JPanel implements ActionListener {
 	private void addBkgImg(Graphics g) {
 		ImageIcon bkgImg = new ImageIcon("kr/ac/jbnu/se/tetris/image/background.jpg");
 		Image bkgImg1 = bkgImg.getImage();
-		g.drawImage(bkgImg1, 0, 0, getWidth(), getHeight(), this);
+		g.drawImage(bkgImg1, 0, 0, getWidth()/2, getHeight(), this);
 	}
 
 	private void drawBackground(Graphics g) { //격자를 그리는 메소드
@@ -333,5 +341,4 @@ public class Board extends JPanel implements ActionListener {
 			}
 		}
 	}
-
 }
