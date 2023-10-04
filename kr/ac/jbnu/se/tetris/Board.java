@@ -19,8 +19,6 @@ public class Board extends JPanel implements ActionListener {
 	private int numLinesRemoved = 0; //제거된 줄의 수를 나타내는 변수
 	private int curX = 0; //현재 블록의 x좌표
 	private int curY = 0; //현재 블록의 y좌표
-	private int ghostY = 0; //현재 블록의 고스트 블록의 y좌표
-	private JLabel statusbar; //게임의 상태를 나타내는 레이블(시작, 일시정지, 게임오버, 스코어 등)
 	private Shape curPiece; //현재 블록을 나타내는 객체
 	private Tetrominoes[] board; //게임 보드를 나타내는 배열
 	private int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
@@ -122,7 +120,7 @@ public class Board extends JPanel implements ActionListener {
 		}
 		repaint(); //게임 보드를 다시 그림
 	}
-	
+
 	private void restart(){ //게임을 재시작하는 메소드
 		bgm.replay();
 		start();
@@ -130,6 +128,7 @@ public class Board extends JPanel implements ActionListener {
 
 	public void paint(Graphics g) { //게임 보드를 그리는 메소드
 		super.paint(g); //부모 클래스의 paint()를 호출
+		addBkgImg(g); // 이미지 위에 격자가 그려질 수 있도록 이미지를 먼저 그리고 격자를 그림
 		drawBackground(g);
 		drawGhost(g, curX, curY, curPiece.getShape());
 		for (int i = 0; i < BoardHeight; ++i) {
@@ -281,29 +280,36 @@ public class Board extends JPanel implements ActionListener {
 		g.drawLine(x + squareWidth() - 1, y + squareHeight() - 1, x + squareWidth() - 1, y + 1); //블록의 오른쪽에 어두운 선을 그림
 	}
 
-	private void drawBackground(Graphics g) { //배경 격자를 그리는 메소드
-		g.setColor(new Color(170, 170, 170)); //회색으로 설정
+	private void addBkgImg(Graphics g) {
+		ImageIcon bkgImg = new ImageIcon("kr/ac/jbnu/se/tetris/image/background.jpg");
+		Image bkgImg1 = bkgImg.getImage();
+		g.drawImage(bkgImg1, 0, 0, getWidth()/2, getHeight(), this);
+	}
 
+	private void drawBackground(Graphics g) { //격자를 그리는 메소드
 		// 가로선 그리기
 		for (int y = 0; y <= BoardHeight * squareHeight(); y += squareHeight()) {
-			g.drawLine(0, boardTop+y, BoardWidth * squareWidth(), boardTop + y);
+			g.setColor(Color.LIGHT_GRAY); // 격자 선 색상 설정
+			g.drawLine(0, boardTop + y, BoardWidth * squareWidth(), boardTop + y);
 		}
 
 		// 세로선 그리기
 		for (int x = 0; x <= BoardWidth * squareWidth(); x += squareWidth()) {
+			g.setColor(Color.LIGHT_GRAY); // 격자 선 색상 설정
 			g.drawLine(x, 0, x, BoardHeight * squareHeight());
 		}
 	}
 
+
 	class TAdapter extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
 			int keycode = e.getKeyCode();
-	
+
 			if (keycode == 'p' || keycode == 'P') {
 				pause();
 				return;
 			}
-	
+
 			if (isPaused) {
 				return;
 			}
