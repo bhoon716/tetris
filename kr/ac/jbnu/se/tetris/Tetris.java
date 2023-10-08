@@ -4,36 +4,51 @@ import java.awt.*;
 import javax.swing.*;
 
 public class Tetris extends JFrame {
-	private String id;
+    private AchievementList achievementList = new AchievementList();
+    
+    private String userId;
+    private int userMaxScore = 100000;
+    private int userMaxCombo = 0;
+    private int userLevel = 0;
 
-	public Tetris() {
-		setSize(400, 400); // 프레임의 크기를 400x400으로 설정
-		setTitle("Tetris"); // 프레임의 타이틀을 "Tetris"로 설정
-		setDefaultCloseOperation(EXIT_ON_CLOSE); // 프레임의 닫기 버튼을 누르면 프로그램 종료
-		setVisible(false);
-		setLayout(new BorderLayout());
-		switchPanel(new Login(this));
-	}
+    public Tetris() {
+        initializeUI();
+    }
 
-	public void setId(String id){
-		this.id = id;
-	}
+    private void initializeUI() {
+        setSize(400, 400);
+        setTitle("Tetris");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setVisible(false);
+        setLayout(new BorderLayout());
+        add(new Login(this));
+    }
 
-	public String getId(){
-		return id;
-	}
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-	public void switchPanel(JPanel panel){
-		getContentPane().removeAll();
-		getContentPane().add(panel);
-		revalidate();
-		repaint();
-		panel.requestFocus();
-	}
+    public String getUserId() {
+        return userId;
+    }
 
-	public static void main(String[] args) {
-		Tetris game = new Tetris();
-		game.setLocationRelativeTo(null); // 프레임을 화면의 가운데에 배치
-		game.setVisible(true); // 프레임을 화면에 표시
-	}
+    public int getUserMaxScore() {
+        return userMaxScore;
+    }
+
+    public void switchPanel(JPanel panel) {
+        getContentPane().removeAll();
+        getContentPane().add(panel);
+        revalidate();
+        repaint();
+        panel.requestFocus();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Tetris game = new Tetris();
+            game.setLocationRelativeTo(null);
+            game.setVisible(true);
+        });
+    }
 }
