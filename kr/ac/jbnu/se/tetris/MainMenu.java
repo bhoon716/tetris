@@ -7,6 +7,9 @@ import java.awt.event.*;
 public class MainMenu extends JPanel {
     private Tetris tetris;
     private JButton[] modeButtons = new JButton[5];
+    private JButton sprintButton = new JButton("스프린트 모드");
+    private JButton timeattackButton = new JButton("타임어택 모드");
+    private JButton pentatrominoesButton = new JButton("펜타트로미노 모드");
     private JButton achievementButton;
     private JButton settingButton;
     private JButton logoutButton;
@@ -18,12 +21,34 @@ public class MainMenu extends JPanel {
 
         // 게임 모드 선택 버튼 배열 초기화
         String[] modeNames = {"쉬운 모드", "보통 모드", "어려운 모드", "매우 어려운 모드", "갓 모드"};
-        JPanel modePanel = new JPanel(new GridLayout(2, 3, 10, 10)); // 간격 추가
+        JPanel modePanel = new JPanel(new GridLayout(4, 3, 10, 10)); // 간격 추가
         modePanel.setBorder(BorderFactory.createTitledBorder("게임 모드 선택"));
         for (int i = 0; i < modeButtons.length; i++) {
             modeButtons[i] = createModeButton(modeNames[i]);
             modePanel.add(modeButtons[i]);
         }
+
+        sprintButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+        
+        timeattackButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+
+        pentatrominoesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+
+        modePanel.add(sprintButton);
+        modePanel.add(timeattackButton);
+        modePanel.add(pentatrominoesButton);
 
         // 아이콘 추가
         ImageIcon achievementIcon = new ImageIcon("achievement_icon.png"); // 아이콘 이미지 파일 경로로 수정

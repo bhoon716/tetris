@@ -11,7 +11,7 @@ public class Board extends JPanel implements ActionListener {
 	private final int BoardWidth = 10; //게임 보드의 가로 칸 수
 	private final int BoardHeight = 22; //게임 보드의 세로 칸 수
 	
-	private String difficulty; //게임의 난이도를 나타내는 변수
+	private String modeName; //게임의 난이도를 나타내는 변수
 	private Timer timer; //게임의 속도를 조절하는 타이머
 	private boolean isFallingFinished = false; //현재 블록이 다 떨어졌는지 확인하는 변수
 	private boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
@@ -34,14 +34,14 @@ public class Board extends JPanel implements ActionListener {
 	private JPanel rightPanel = new JPanel();
 	private JButton backButton = new JButton("뒤로 가기");
 	
-	public Board(Tetris tetris, String difficulty) {
+	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
-		this.difficulty = difficulty;
+		this.modeName = modeName;
 		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
 		setPreferredSize(new Dimension(250, 400));
 		
 		curPiece = new Shape(); //현재 블록을 생성(NoShape)
-		timer = new Timer(getTimerDelay(difficulty), this); //타이머 생성(400ms마다 actionPerformed()를 호출)
+		timer = new Timer(getTimerDelay(modeName), this); //타이머 생성(400ms마다 actionPerformed()를 호출)
 		bgm.play(); //배경음악 재생
 		timer.start(); //타이머 시작
 		board = new Tetrominoes[BoardWidth * BoardHeight]; //게임 보드를 나타내는 배열 생성
@@ -111,18 +111,18 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
 
-	private int getTimerDelay(String difficulty){
-		switch(difficulty){
+	private int getTimerDelay(String modeName){
+		switch(modeName){
 			case "쉬운 모드":
 				return 400;
 			case "보통 모드":
-				return 300;
-			case "어려운 모드":
 				return 200;
-			case "매우 어려운 모드":
+			case "어려운 모드":
 				return 100;
+			case "매우 어려운 모드":
+				return 70;
 			case "갓 모드":
-				return 50;
+				return 30;
 			default:
 				return 400;
 		}

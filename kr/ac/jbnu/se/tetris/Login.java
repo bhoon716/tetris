@@ -2,143 +2,112 @@ package kr.ac.jbnu.se.tetris;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 
 public class Login extends JPanel {
     private Tetris tetris;
 
-    private JPanel loginPanel = new JPanel();
-    private JPanel signUpPanel = new JPanel();
+    private JPanel loginPanel = new JPanel(new GridLayout(3, 2, 10, 10));
+    private JPanel signUpPanel = new JPanel(new GridLayout(6, 2, 10, 10));
+    private JLabel loginId = new JLabel("ID : ");
+    private JLabel loginPw = new JLabel("Password : ");
+    private JLabel signUpId = new JLabel("ID : ");
+    private JLabel signUpPw = new JLabel("Password : ");
     private JButton loginButton = new JButton("Login");
     private JButton signUpButton = new JButton("Sign Up");
     private JButton submitButton = new JButton("Submit");
     private JButton backButton = new JButton("Back");
-    private JButton checkDuplicateButton = new JButton("Check Duplicate");
-    private JTextField loginIdField = new JTextField(15);
-    private JPasswordField loginPwField = new JPasswordField(15);
-    private JTextField signUpIdField = new JTextField(15);
-    private JPasswordField signUpPwField = new JPasswordField(15);
-    private JPasswordField signUpConfirmPwField = new JPasswordField(15);
+    private JButton checkDuplicateButton = new JButton("ID 중복 확인");
+    private JTextField loginIdField = new JTextField(12);
+    private JPasswordField loginPwField = new JPasswordField(12);
+    private JTextField signUpIdField = new JTextField(12);
+    private JPasswordField signUpPwField = new JPasswordField(12);
+    private JPasswordField signUpConfirmPwField = new JPasswordField(12);
 
-    public Login(Tetris tetris) {
+    public Login(Tetris tetris){
         this.tetris = tetris;
 
-        setLayout(new CardLayout());
-        add(loginPanel, "login");
-        add(signUpPanel, "signup");
+        add(loginPanel);
+        add(signUpPanel);
 
-        createLoginPanel();
-        createSignUpPanel();
+        loginPanel.setBorder(BorderFactory.createTitledBorder("로그인"));
+        loginPanel.add(loginId);
+        loginPanel.add(loginIdField);
+        loginPanel.add(loginPw);
+        loginPanel.add(loginPwField);
+        loginPanel.add(loginButton);
+        loginPanel.add(signUpButton);
 
-        CardLayout cardLayout = (CardLayout) getLayout();
-        cardLayout.show(this, "login");
+        signUpPanel.setBorder(BorderFactory.createTitledBorder("회원가입"));
+        signUpPanel.add(signUpId);
+        signUpPanel.add(signUpIdField);
+        signUpPanel.add(new JLabel());
+        signUpPanel.add(checkDuplicateButton);
+        signUpPanel.add(signUpPw);
+        signUpPanel.add(signUpPwField);
+        signUpPanel.add(new JLabel("Password 확인 : "));
+        signUpPanel.add(signUpConfirmPwField);
+        signUpPanel.add(submitButton);
+        signUpPanel.add(backButton);
+
+        signUpPanel.setVisible(false);
+
+        loginButton.addActionListener(e -> login());
+        signUpButton.addActionListener(e -> showSignUpPanel());
+
+        checkDuplicateButton.addActionListener(e -> checkDuplicate());
+        submitButton.addActionListener(e -> submitSignUp());
+        backButton.addActionListener(e -> showLoginPanel());
     }
 
-    private void createLoginPanel() {
-        loginPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        loginPanel.add(new JLabel("ID:"), gbc);
-
-        gbc.gridx = 1;
-        loginPanel.add(loginIdField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        loginPanel.add(new JLabel("Password:"), gbc);
-
-        gbc.gridx = 1;
-        loginPanel.add(loginPwField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        JPanel buttonPanel = createButtonPanel(loginButton, signUpButton);
-        loginPanel.add(buttonPanel, gbc);
-
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tetris.switchPanel(new MainMenu(tetris));
-            }
-        });
-
-        signUpButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                CardLayout cardLayout = (CardLayout) getLayout();
-                cardLayout.show(Login.this, "signup");
-            }
-        });
-    }
-
-    private void createSignUpPanel() {
-        signUpPanel.setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        signUpPanel.add(new JLabel("ID:"), gbc);
-
-        gbc.gridx = 1;
-        signUpPanel.add(signUpIdField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        signUpPanel.add(new JLabel("Password:"), gbc);
-
-        gbc.gridx = 1;
-        signUpPanel.add(signUpPwField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        signUpPanel.add(new JLabel("Confirm Password:"), gbc);
-
-        gbc.gridx = 1;
-        signUpPanel.add(signUpConfirmPwField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        JPanel buttonPanel = createButtonPanel(checkDuplicateButton, submitButton, backButton);
-        signUpPanel.add(buttonPanel, gbc);
-
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                CardLayout cardLayout = (CardLayout) getLayout();
-                cardLayout.show(Login.this, "login");
-            }
-        });
-
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                CardLayout cardLayout = (CardLayout) getLayout();
-                cardLayout.show(Login.this, "login");
-            }
-        });
-
-        checkDuplicateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String idToCheck = signUpIdField.getText();
-                JOptionPane.showMessageDialog(Login.this, "아이디 중복 확인: " + idToCheck);
-            }
-        });
-    }
-
-    private JPanel createButtonPanel(JButton... buttons) {
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-        for (JButton button : buttons) {
-            buttonPanel.add(button);
+    // 로그인 로직
+    private void login() {
+        String id = loginIdField.getText();
+        String pw = loginPwField.getText();
+        if(id.isEmpty() || pw.isEmpty()){
+            JOptionPane.showMessageDialog(null, "ID와 Password를 입력해주세요.", "로그인 실패", JOptionPane.ERROR_MESSAGE);
+        } else {
+            // 로그인 성공
+            tetris.setUserId(id);
+            tetris.switchPanel(new MainMenu(tetris));
         }
-        return buttonPanel;
+    }
+
+    // 회원가입 패널 표시
+    private void showSignUpPanel() {
+        loginPanel.setVisible(false);
+        signUpPanel.setVisible(true);
+    }
+
+    // ID 중복 확인
+    private void checkDuplicate() {
+        String id = signUpIdField.getText();
+        if(id.isEmpty()){
+            JOptionPane.showMessageDialog(null, "ID를 입력해주세요.", "ID 중복 확인 실패", JOptionPane.ERROR_MESSAGE);
+        } else {
+            // ID 중복 확인 성공
+            JOptionPane.showMessageDialog(null, "사용 가능한 ID입니다.", "ID 중복 확인 성공", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    // 회원가입 로직
+    private void submitSignUp() {
+        String id = signUpIdField.getText();
+        String pw = signUpPwField.getText();
+        String confirmPw = signUpConfirmPwField.getText();
+        if(id.isEmpty() || pw.isEmpty() || confirmPw.isEmpty()){
+            JOptionPane.showMessageDialog(null, "ID와 Password를 입력해주세요.", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
+        } else if(!pw.equals(confirmPw)){
+            JOptionPane.showMessageDialog(null, "Password가 일치하지 않습니다.", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
+        } else {
+            // 회원가입 성공
+            JOptionPane.showMessageDialog(null, "회원가입에 성공했습니다.", "회원가입 성공", JOptionPane.INFORMATION_MESSAGE);
+            showLoginPanel();
+        }
+    }
+
+    // 로그인 패널 표시
+    private void showLoginPanel() {
+        signUpPanel.setVisible(false);
+        loginPanel.setVisible(true);
     }
 }
