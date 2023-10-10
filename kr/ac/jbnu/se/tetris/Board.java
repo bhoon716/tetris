@@ -6,29 +6,28 @@ import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
 	private Tetris tetris;
-	private Bgm bgm = new Bgm(); //배경음악 객체
+	protected Bgm bgm = new Bgm(); //배경음악 객체
 
-	private final int BoardWidth = 10; //게임 보드의 가로 칸 수
-	private final int BoardHeight = 22; //게임 보드의 세로 칸 수
+	protected final int BoardWidth = 10; //게임 보드의 가로 칸 수
+	protected final int BoardHeight = 22; //게임 보드의 세로 칸 수
 	
-	private String modeName; //게임의 난이도를 나타내는 변수
 	private Timer timer; //게임의 속도를 조절하는 타이머
 	private boolean isFallingFinished = false; //현재 블록이 다 떨어졌는지 확인하는 변수
 	private boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
 	private boolean isPaused = false; //게임이 일시정지되었는지를 나타내는 변수
 	private int numLinesRemoved = 0; //제거된 줄의 수를 나타내는 변수
-	private int curX = 0; //현재 블록의 x좌표
-	private int curY = 0; //현재 블록의 y좌표
-	private Shape curPiece; //현재 블록을 나타내는 객체
+	protected int curX = 0; //현재 블록의 x좌표
+	protected int curY = 0; //현재 블록의 y좌표
+	protected Shape curPiece; //현재 블록을 나타내는 객체
 	private Tetrominoes[] board; //게임 보드를 나타내는 배열
 	private int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
-	private int combo = 0;
-	private int score = 0;
-	private String curStatus = "Playing";
+	protected int combo = 0;
+	protected int score = 0;
+	protected String curStatus = "Playing";
 	private JLabel scoreLabel = new JLabel("Score : " + score);
-	private JLabel statusLabel = new JLabel("Status : " + curStatus);
+	private JLabel statusLabel = new JLabel(curStatus);
 	private JLabel comboLabel = new JLabel("Combo : " + combo);
-	private JPanel statusPanel = new JPanel();
+	protected JPanel statusPanel = new JPanel();
 	private JPanel nextBlockPanel = new JPanel();
 	private JPanel holdBlockPanel = new JPanel();
 	private JPanel rightPanel = new JPanel();
@@ -36,7 +35,6 @@ public class Board extends JPanel implements ActionListener {
 	
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
-		this.modeName = modeName;
 		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
 		setPreferredSize(new Dimension(250, 400));
 		
@@ -64,35 +62,32 @@ public class Board extends JPanel implements ActionListener {
 		statusPanel.add(holdBlockPanel, BorderLayout.CENTER);
 		statusPanel.add(rightPanel, BorderLayout.SOUTH);
 		
+		rightPanel.setPreferredSize(new Dimension(120, 50));
 		rightPanel.setLayout(new BorderLayout());
 		rightPanel.setBackground(Color.RED);
-		rightPanel.add(scoreLabel, BorderLayout.NORTH);
-		rightPanel.add(statusLabel, BorderLayout.CENTER);
+		rightPanel.add(statusLabel, BorderLayout.NORTH);
+		rightPanel.add(scoreLabel, BorderLayout.CENTER);
 		rightPanel.add(comboLabel, BorderLayout.SOUTH);
-
-		backButton.setPreferredSize(new Dimension(100, 40));
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-				bgm.stop(); //배경음악 정지
-                tetris.switchPanel(new MainMenu(tetris)); // 메인 메뉴 화면으로 전환
-            }
-        });
-
-        // 뒤로 가기 버튼을 statusPanel에 추가
+		backButton.setPreferredSize(new Dimension(100, 30));
+		backButton.addActionListener(e -> backButtonListener());
         statusPanel.add(backButton, BorderLayout.SOUTH);
 	}
 
 	@Override
-		public void actionPerformed(ActionEvent e) { //타이머가 400ms마다 호출하는 메소드
-			if (isFallingFinished) { //블록이 떨어지는 것이 끝났다면
-				isFallingFinished = false; //끝났음을 나타내는 변수를 false로 설정
-				newPiece(); //새로운 블록을 생성
+	public void actionPerformed(ActionEvent e) { //타이머가 400ms마다 호출하는 메소드
+		if (isFallingFinished) { //블록이 떨어지는 것이 끝났다면
+			isFallingFinished = false; //끝났음을 나타내는 변수를 false로 설정
+			newPiece(); //새로운 블록을 생성
 
-			} else { //떨어지는 것이 끝나지 않았다면
-				oneLineDown(); //블록을 한 칸 아래로 이동
-			}
+		} else { //떨어지는 것이 끝나지 않았다면
+			oneLineDown(); //블록을 한 칸 아래로 이동
 		}
+	}
+
+	public void backButtonListener(){
+		bgm.stop(); //배경음악 정지
+		tetris.switchPanel(new MainMenu(tetris)); // 메인 메뉴 화면으로 전환
+	}
 
 	private void drawGhost(Graphics g, int curX, int curY, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
 		if(curPiece.getShape() == Tetrominoes.NoShape)
@@ -114,6 +109,7 @@ public class Board extends JPanel implements ActionListener {
 	private int getTimerDelay(String modeName){
 		switch(modeName){
 			case "쉬운 모드":
+			case "스프린트 모드":
 				return 400;
 			case "보통 모드":
 				return 200;
@@ -136,7 +132,7 @@ public class Board extends JPanel implements ActionListener {
 		return (int) getSize().getHeight() / BoardHeight; //게임 보드의 세로 공간을 BoardHeight로 나눈 값(한 칸의 세로 길이)
 	}
 
-	private Tetrominoes shapeAt(int x, int y) {
+	protected Tetrominoes shapeAt(int x, int y) {
 		return board[(y * BoardWidth) + x]; //게임 보드의 (x, y) 위치에 있는 블록의 모양을 반환
 	}
 
@@ -177,6 +173,12 @@ public class Board extends JPanel implements ActionListener {
 		start();
 	}
 
+	protected void stopGame(){
+		isStarted = false;
+		timer.stop(); //타이머 정지
+		bgm.stop();
+	}
+
 	public void paint(Graphics g) { //게임 보드를 그리는 메소드
 		super.paint(g); //부모 클래스의 paint()를 호출
 		addBkgImg(g);
@@ -204,8 +206,8 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	private void updateScorePanel(){
+		statusLabel.setText(curStatus);
 		scoreLabel.setText("Score : " + score);
-		statusLabel.setText("Status : " + curStatus);
 		comboLabel.setText("Combo : " + combo);
 	}
 
@@ -219,7 +221,7 @@ public class Board extends JPanel implements ActionListener {
 		pieceDropped(); //블록을 한 칸 아래로 이동
 	}
 
-	private void oneLineDown() { //블록을 한 칸 아래로 이동하는 메소드
+	protected void oneLineDown() { //블록을 한 칸 아래로 이동하는 메소드
 		if (!tryMove(curPiece, curX, curY - 1)) //블록을 한 칸 아래로 이동할 수 없다면
 			pieceDropped(); //블록을 한 칸 아래로 이동
 	}
@@ -242,21 +244,19 @@ public class Board extends JPanel implements ActionListener {
 			newPiece(); //새로운 블록을 생성?
 	}
 
-	private void newPiece() { //새로운 블록을 생성하는 메소드
+	protected void newPiece() { //새로운 블록을 생성하는 메소드
 		curPiece.setRandomShape(); //새로운 블록의 모양을 랜덤으로 설정
 		curX = BoardWidth / 2; //새로운 블록의 x좌표
 		curY = BoardHeight - 1 + curPiece.minY(); //새로운 블록의 y좌표
 
 		if (!tryMove(curPiece, curX, curY)) { //새로운 위치로 블록을 이동할 수 없다면
 			curPiece.setShape(Tetrominoes.NoShape); //현재 블록의 모양을 NoShape(없음)으로 설정
-			timer.stop(); //타이머 정지
-			isStarted = false; //게임이 시작되었음을 나타내는 변수를 false로 설정
 			curStatus = "Game Over";
-			bgm.stop(); //배경음악 정지
+			stopGame(); //게임 정지
 		}
 	}
 
-	private boolean tryMove(Shape newPiece, int newX, int newY) { //새로운 위치(newX, newY)로 블록을 이동하려고 시도하는 메소드
+	protected boolean tryMove(Shape newPiece, int newX, int newY) { //새로운 위치(newX, newY)로 블록을 이동하려고 시도하는 메소드
 		for (int i = 0; i < 4; ++i) { //새로운 블록의 모든 칸에 대해
 			int x = newX + newPiece.x(i); //새로운 블록의 x좌표
 			int y = newY - newPiece.y(i); //새로운 블록의 y좌표
@@ -290,7 +290,7 @@ public class Board extends JPanel implements ActionListener {
 		return true;
 	}
 
-	private void removeFullLines() {
+	protected void removeFullLines() {
 		int numFullLines = 0;
 		int comboScore = 0;
 	
@@ -327,6 +327,10 @@ public class Board extends JPanel implements ActionListener {
 			comboScore = 50 * combo;
 		}
 		score += 100 * numFullLines + comboScore;		
+	}
+
+	public int getLineCount() {
+		return numLinesRemoved;
 	}
 
 	private void drawSquare(Graphics g, int x, int y, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양

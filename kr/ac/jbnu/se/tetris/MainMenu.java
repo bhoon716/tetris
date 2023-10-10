@@ -31,12 +31,14 @@ public class MainMenu extends JPanel {
         sprintButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                tetris.switchPanel(new SprintMode(tetris));
             }
         });
         
         timeattackButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                tetris.switchPanel(new TimeAttackMode(tetris));
             }
         });
 
