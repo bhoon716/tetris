@@ -6,7 +6,7 @@ import javax.swing.*;
 
 public class Board extends JPanel implements ActionListener {
 	private Tetris tetris;
-	private Bgm bgm = new Bgm(); //배경음악 객체
+	private Bgm bgm; //배경음악 객체
 
 	private final int BoardWidth = 10; //게임 보드의 가로 칸 수
 	private final int BoardHeight = 22; //게임 보드의 세로 칸 수
@@ -41,14 +41,17 @@ public class Board extends JPanel implements ActionListener {
 		setPreferredSize(new Dimension(250, 400));
 		
 		curPiece = new Shape(); //현재 블록을 생성(NoShape)
+		// Tetris 클래스에서 생성한 Bgm 인스턴스를 가져옵니다.
+        Bgm bgm = tetris.getBgm();
+        bgm.play();
 		timer = new Timer(getTimerDelay(difficulty), this); //타이머 생성(400ms마다 actionPerformed()를 호출)
-		bgm.play(); //배경음악 재생
+		
 		timer.start(); //타이머 시작
 		board = new Tetrominoes[BoardWidth * BoardHeight]; //게임 보드를 나타내는 배열 생성
 		clearBoard(); //게임 보드를 초기화
 		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
 		start();
-
+		
 		statusPanel.setPreferredSize(new Dimension(190, 400));
 		statusPanel.setLayout(new FlowLayout());
 		statusPanel.setBackground(Color.ORANGE);
@@ -148,6 +151,7 @@ public class Board extends JPanel implements ActionListener {
 		isFallingFinished = false; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 false로 설정
 		numLinesRemoved = 0; //제거된 줄의 수를 0으로 설정
 		clearBoard(); //게임 보드를 초기화
+		
 
 		newPiece(); //새로운 블록을 생성
 		timer.start(); //타이머 시작

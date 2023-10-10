@@ -11,11 +11,11 @@ public class MainMenu extends JPanel {
     private JButton settingButton;
     private JButton logoutButton;
     private JLabel profileLabel;
-
+    
     public MainMenu(Tetris tetris) {
         this.tetris = tetris;
         setLayout(new BorderLayout());
-
+        
         // 게임 모드 선택 버튼 배열 초기화
         String[] modeNames = {"쉬운 모드", "보통 모드", "어려운 모드", "매우 어려운 모드", "갓 모드"};
         JPanel modePanel = new JPanel(new GridLayout(2, 3, 10, 10)); // 간격 추가
@@ -93,6 +93,7 @@ public class MainMenu extends JPanel {
                 tetris.switchPanel(new Achievement(tetris));
             } else if (buttonText.equals("설정")) {
                 // 설정 화면으로 이동하는 코드 추가
+            	 tetris.switchPanel(new SettingMenu(tetris));
             }
         }
     };
