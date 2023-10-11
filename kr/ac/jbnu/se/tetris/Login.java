@@ -2,6 +2,7 @@ package kr.ac.jbnu.se.tetris;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 
 public class Login extends JPanel {
     private Tetris tetris;
@@ -40,7 +41,7 @@ public class Login extends JPanel {
         signUpPanel.setBorder(BorderFactory.createTitledBorder("회원가입"));
         signUpPanel.add(signUpId);
         signUpPanel.add(signUpIdField);
-        signUpPanel.add(new JLabel());
+        signUpPanel.add(new JLabel()); // 빈 라벨
         signUpPanel.add(checkDuplicateButton);
         signUpPanel.add(signUpPw);
         signUpPanel.add(signUpPwField);
@@ -62,10 +63,13 @@ public class Login extends JPanel {
     // 로그인 로직
     private void login() {
         String id = loginIdField.getText();
-        String pw = loginPwField.getText();
-        if(id.isEmpty() || pw.isEmpty()){
+        char[] pw = loginPwField.getPassword();
+        if(id.isEmpty() || pw.length == 0){
             JOptionPane.showMessageDialog(null, "ID와 Password를 입력해주세요.", "로그인 실패", JOptionPane.ERROR_MESSAGE);
-        } else {
+        } 
+        //pw 확인 로직 추가
+        // else if(){}
+        else {
             // 로그인 성공
             tetris.setUserId(id);
             tetris.switchPanel(new MainMenu(tetris));
@@ -74,6 +78,7 @@ public class Login extends JPanel {
 
     // 회원가입 패널 표시
     private void showSignUpPanel() {
+        clearFields();
         loginPanel.setVisible(false);
         signUpPanel.setVisible(true);
     }
@@ -92,11 +97,11 @@ public class Login extends JPanel {
     // 회원가입 로직
     private void submitSignUp() {
         String id = signUpIdField.getText();
-        String pw = signUpPwField.getText();
-        String confirmPw = signUpConfirmPwField.getText();
-        if(id.isEmpty() || pw.isEmpty() || confirmPw.isEmpty()){
+        char[] pw = signUpPwField.getPassword();
+        char[] confirmPw = signUpConfirmPwField.getPassword();
+        if(id.isEmpty() || pw.length == 0 || confirmPw.length == 0){
             JOptionPane.showMessageDialog(null, "ID와 Password를 입력해주세요.", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
-        } else if(!pw.equals(confirmPw)){
+        } else if(!Arrays.equals(pw, confirmPw)){
             JOptionPane.showMessageDialog(null, "Password가 일치하지 않습니다.", "회원가입 실패", JOptionPane.ERROR_MESSAGE);
         } else {
             // 회원가입 성공
@@ -107,7 +112,17 @@ public class Login extends JPanel {
 
     // 로그인 패널 표시
     private void showLoginPanel() {
+        clearFields();
         signUpPanel.setVisible(false);
         loginPanel.setVisible(true);
+    }
+
+    // id, pw, confirmPw 필드 초기화
+    private void clearFields() {
+        loginIdField.setText("");
+        loginPwField.setText("");
+        signUpIdField.setText("");
+        signUpPwField.setText("");
+        signUpConfirmPwField.setText("");
     }
 }

@@ -12,6 +12,7 @@ public class Board extends JPanel implements ActionListener {
 	protected final int BoardHeight = 22; //게임 보드의 세로 칸 수
 	
 	private Timer timer; //게임의 속도를 조절하는 타이머
+	protected long startTime; //게임 시작 시간을 저장하는 변수
 	private boolean isFallingFinished = false; //현재 블록이 다 떨어졌는지 확인하는 변수
 	private boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
 	private boolean isPaused = false; //게임이 일시정지되었는지를 나타내는 변수
@@ -23,7 +24,8 @@ public class Board extends JPanel implements ActionListener {
 	private int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
 	protected int combo = 0;
 	protected int score = 0;
-	protected String curStatus = "Playing";
+	protected String curStatus = "";
+	private String modeName = "";
 	private JLabel scoreLabel = new JLabel("Score : " + score);
 	private JLabel statusLabel = new JLabel(curStatus);
 	private JLabel comboLabel = new JLabel("Combo : " + combo);
@@ -31,13 +33,14 @@ public class Board extends JPanel implements ActionListener {
 	private JPanel nextBlockPanel = new JPanel();
 	private JPanel holdBlockPanel = new JPanel();
 	private JPanel rightPanel = new JPanel();
-	private JButton backButton = new JButton("뒤로 가기");
+	private JButton backButton = new JButton("Back");
 	
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
+		this.modeName = modeName;
+		this.curStatus = modeName;
 		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
 		setPreferredSize(new Dimension(250, 400));
-		
 		curPiece = new Shape(); //현재 블록을 생성(NoShape)
 		timer = new Timer(getTimerDelay(modeName), this); //타이머 생성(400ms마다 actionPerformed()를 호출)
 		bgm.play(); //배경음악 재생
@@ -52,10 +55,10 @@ public class Board extends JPanel implements ActionListener {
 		statusPanel.setBackground(Color.ORANGE);
 		add(statusPanel, BorderLayout.EAST);
 
-		nextBlockPanel.setPreferredSize(new Dimension(120,120));
+		nextBlockPanel.setPreferredSize(new Dimension(100,100));
 		nextBlockPanel.setBackground(Color.YELLOW);
 
-		holdBlockPanel.setPreferredSize(new Dimension(120,120));
+		holdBlockPanel.setPreferredSize(new Dimension(100,100));
 		holdBlockPanel.setBackground(Color.GREEN);
 
 		statusPanel.add(nextBlockPanel, BorderLayout.NORTH);
@@ -110,6 +113,7 @@ public class Board extends JPanel implements ActionListener {
 		switch(modeName){
 			case "쉬운 모드":
 			case "스프린트 모드":
+			case "타임어택 모드":
 				return 400;
 			case "보통 모드":
 				return 200;
@@ -140,6 +144,7 @@ public class Board extends JPanel implements ActionListener {
 		if (isPaused) //게임이 일시정지되었다면
 			return; //메소드 종료
 
+		startTime = System.currentTimeMillis(); //게임 시작 시간 기록
 		isStarted = true; //게임이 시작되었음을 나타내는 변수를 true로 설정
 		isFallingFinished = false; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 false로 설정
 		numLinesRemoved = 0; //제거된 줄의 수를 0으로 설정
@@ -156,24 +161,33 @@ public class Board extends JPanel implements ActionListener {
 		isPaused = !isPaused; //게임이 일시정지되었음을 나타내는 변수를 반전
 		if (isPaused) { //게임이 일시정지되었다면
 			timer.stop(); //타이머 정지
-			curStatus = "Paused";
+			curStatus = modeName + " (Paused)";
 			bgm.stop();
 		} else { //게임이 일시정지되지 않았다면
 			timer.start(); //타이머 시작
-			curStatus = "Playing";
+			curStatus = modeName;
 			bgm.play();
 		}
 		repaint(); //게임 보드를 다시 그림
 	}
 
 	private void restart(){ //게임을 재시작하는 메소드
-		score = 0;
-		curStatus = "Playing";
-		bgm.replay();
-		start();
+		pause();
+		int choice = JOptionPane.showConfirmDialog(this, "게임을 재시작하시겠습니까?", "게임 재시작 확인", JOptionPane.YES_NO_OPTION);
+		if(choice == JOptionPane.YES_OPTION){
+			pause();
+			score = 0;
+			curStatus = modeName;
+			bgm.replay();
+			start();
+		}
+		else{
+			pause();
+		}
 	}
 
 	protected void stopGame(){
+		curPiece.setShape(Tetrominoes.NoShape); //현재 블록의 모양을 NoShape(없음)으로 설정 
 		isStarted = false;
 		timer.stop(); //타이머 정지
 		bgm.stop();
@@ -209,6 +223,10 @@ public class Board extends JPanel implements ActionListener {
 		statusLabel.setText(curStatus);
 		scoreLabel.setText("Score : " + score);
 		comboLabel.setText("Combo : " + combo);
+	}
+
+	public int getNumLinesRemoved() { //제거된 줄의 수를 반환하는 메소드
+		return numLinesRemoved;
 	}
 
 	private void dropDown() { //블록을 한 칸 아래로 이동하는 메소드
@@ -250,7 +268,6 @@ public class Board extends JPanel implements ActionListener {
 		curY = BoardHeight - 1 + curPiece.minY(); //새로운 블록의 y좌표
 
 		if (!tryMove(curPiece, curX, curY)) { //새로운 위치로 블록을 이동할 수 없다면
-			curPiece.setShape(Tetrominoes.NoShape); //현재 블록의 모양을 NoShape(없음)으로 설정
 			curStatus = "Game Over";
 			stopGame(); //게임 정지
 		}
