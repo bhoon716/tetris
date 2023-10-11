@@ -5,12 +5,17 @@ import javax.swing.*;
 
 public class Tetris extends JFrame {
     private AchievementList achievementList = new AchievementList();
+<<<<<<< HEAD
     
     private Player player = new Player("test", 0, 0, 0, achievementList);
+=======
+    private Bgm bgm;
+>>>>>>> 1b3495f991f33aef2a949b8cc44a355dcc1f32f9
     private String userId;
 
     public Tetris() {
         initializeUI();
+        bgm = new Bgm();
     }
 
     private void initializeUI() {
@@ -40,6 +45,17 @@ public class Tetris extends JFrame {
         revalidate();
         repaint();
         panel.requestFocus();
+    }
+    // BGM 인스턴스를 반환하는 메서드
+    public Bgm getBgm() {
+        return bgm;
+    }
+    // BGM 볼륨을 조절하는 메서드
+    public void adjustVolume(float volume) {
+        bgm.setVolume(volume);
+    }
+    public void restartBgm() {
+        bgm.replay();
     }
 
     public static void main(String[] args) {

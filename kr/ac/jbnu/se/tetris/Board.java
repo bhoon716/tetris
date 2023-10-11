@@ -49,7 +49,7 @@ public class Board extends JPanel implements ActionListener {
 		clearBoard(); //게임 보드를 초기화
 		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
 		start();
-
+		
 		statusPanel.setPreferredSize(new Dimension(190, 400));
 		statusPanel.setLayout(new FlowLayout());
 		statusPanel.setBackground(Color.ORANGE);
@@ -149,6 +149,7 @@ public class Board extends JPanel implements ActionListener {
 		isFallingFinished = false; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 false로 설정
 		numLinesRemoved = 0; //제거된 줄의 수를 0으로 설정
 		clearBoard(); //게임 보드를 초기화
+		
 
 		newPiece(); //새로운 블록을 생성
 		timer.start(); //타이머 시작
