@@ -5,12 +5,10 @@ import javax.swing.*;
 
 public class Tetris extends JFrame {
     private AchievementList achievementList = new AchievementList();
-<<<<<<< HEAD
     
     private Player player = new Player("test", 0, 0, 0, achievementList);
-=======
+
     private Bgm bgm;
->>>>>>> 1b3495f991f33aef2a949b8cc44a355dcc1f32f9
     private String userId;
 
     public Tetris() {
