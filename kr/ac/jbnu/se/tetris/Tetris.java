@@ -5,11 +5,13 @@ import javax.swing.*;
 
 public class Tetris extends JFrame {
     private AchievementList achievementList = new AchievementList();
+<<<<<<< HEAD
+    
+    private Player player = new Player("test", 0, 0, 0, achievementList);
+=======
     private Bgm bgm;
+>>>>>>> 1b3495f991f33aef2a949b8cc44a355dcc1f32f9
     private String userId;
-    private int userMaxScore = 100000;
-    private int userMaxCombo = 0;
-    private int userLevel = 0;
 
     public Tetris() {
         initializeUI();
@@ -26,15 +28,15 @@ public class Tetris extends JFrame {
     }
 
     public void setUserId(String userId) {
-        this.userId = userId;
+        player.setUserId(userId);
     }
 
     public String getUserId() {
-        return userId;
+        return player.getUserId();
     }
 
     public int getUserMaxScore() {
-        return userMaxScore;
+        return player.getMaxScore();
     }
 
     public void switchPanel(JPanel panel) {
