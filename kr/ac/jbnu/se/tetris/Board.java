@@ -96,6 +96,7 @@ public class Board extends JPanel implements ActionListener {
 
 	public void backButtonListener() {
 		bgm.stop(); //배경음악 정지
+		removePauseScreen();
 		tetris.switchPanel(new MainMenu(tetris)); // 메인 메뉴 화면으로 전환
 	}
 
