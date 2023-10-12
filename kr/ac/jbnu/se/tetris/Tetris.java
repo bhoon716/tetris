@@ -7,22 +7,16 @@ public class Tetris extends JFrame {
     private AchievementList achievementList = new AchievementList();
     
     private Player player = new Player("test", 0, 0, 0, achievementList);
-
-    private Bgm bgm;
     private String userId;
+    private int bgmVolume = 100;
 
     public Tetris() {
-        initializeUI();
-        bgm = new Bgm();
-    }
-
-    private void initializeUI() {
         setSize(400, 400);
         setTitle("Tetris");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(false);
         setLayout(new BorderLayout());
-        add(new Login(this));
+        add(new MainMenu(this));
     }
 
     public void setUserId(String userId) {
@@ -44,16 +38,13 @@ public class Tetris extends JFrame {
         repaint();
         panel.requestFocus();
     }
-    // BGM 인스턴스를 반환하는 메서드
-    public Bgm getBgm() {
-        return bgm;
+
+    public void setBgmVolume(int volume) {
+        this.bgmVolume = volume;
     }
-    // BGM 볼륨을 조절하는 메서드
-    public void adjustVolume(float volume) {
-        bgm.setVolume(volume);
-    }
-    public void restartBgm() {
-        bgm.replay();
+
+    public int getBgmVolume() {
+        return bgmVolume;
     }
 
     public static void main(String[] args) {

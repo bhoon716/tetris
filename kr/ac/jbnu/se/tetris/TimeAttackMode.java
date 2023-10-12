@@ -3,7 +3,7 @@ package kr.ac.jbnu.se.tetris;
 import javax.swing.*;
 
 public class TimeAttackMode extends Board{
-    private static final int SPRINT_MODE_TIME_LIMIT = 1000 * 120; // 스프린트 모드의 제한 시간 (120초)
+    private static final int SPRINT_MODE_TIME_LIMIT = 1000 * 120; // 타임어택 모드의 제한 시간 (120초)
 
     private Timer timer; // 타임어택 모드의 타이머
     private long startTime; // 게임 시작 시간을 저장하는 변수
@@ -16,6 +16,7 @@ public class TimeAttackMode extends Board{
         timer.start(); // 타이머 시작
     }
 
+    // 시간이 초과되었는지 확인하는 메소드
     public void checkTimeOver() {
         if (!isGameOver && System.currentTimeMillis() - startTime > SPRINT_MODE_TIME_LIMIT) { // 게임이 종료되지 않았고, 제한 시간을 초과한 경우
             stopGame(); // 게임 종료
@@ -24,4 +25,12 @@ public class TimeAttackMode extends Board{
             JOptionPane.showMessageDialog(null, removedLines + "줄 제거!", "Time Over!", JOptionPane.INFORMATION_MESSAGE, null);
         }
     }
+
+    // 제거한 줄을 출력하는 메소드
+    @Override
+    protected void updateScorePanel() {
+		statusLabel.setText(curStatus);
+		scoreLabel.setText("제거한 줄 : " + numLinesRemoved);
+		comboLabel.setText("Combo : " + combo);
+	}
 }

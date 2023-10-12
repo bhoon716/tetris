@@ -4,7 +4,7 @@ public class AchievementList {
     private AchievementItem[] achievementItems = new AchievementItem[10];
 
     public AchievementList(){
-        achievementItems[0] = new AchievementItem("초보자", "최고 점수 10000점 달성", false);
+        achievementItems[0] = new AchievementItem("초보자", "최고 점수 10000점 달성", true);
         achievementItems[1] = new AchievementItem("중수", "최고 점수 50000점 달성", false);
         achievementItems[2] = new AchievementItem("고수", "최고 점수 100000점 달성", false);
         achievementItems[3] = new AchievementItem("마스터", "최고 점수 200000점 달성", false);
@@ -17,17 +17,15 @@ public class AchievementList {
     }
 
     public String[] getAchievement(){
-        String[] achievement = new String[achievementItems.length];
-        for(int i = 0; i < achievementItems.length; i++){
-            achievement[i] = "[" + achievementItems[i].getName() + "] :" + achievementItems[i].getDescription() + " " + achievementItems[i].getIsAchieved();
+        String[] achievedList = new String[achievementItems.length];
+        int index = 0;
+        for (int i=0; i<achievementItems.length; i++){
+            if (achievementItems[i].getIsAchieved()){
+                achievedList[index]  = "[" + achievementItems[i].getName() + "] : " + achievementItems[i].getDescription();
+            }
         }
-        return achievement;
+        return achievedList;
     }
-
-    public void updateAchievements(AchievementItem[] updatedAchievements) {
-        this.achievementItems = updatedAchievements;
-    }
-
 
     public class AchievementItem{
         private String name;

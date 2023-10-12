@@ -1,6 +1,9 @@
 package kr.ac.jbnu.se.tetris;
 
 import javax.sound.sampled.*;
+import javax.swing.JSlider;
+import javax.swing.event.*;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -52,19 +55,7 @@ public class Bgm {
 
     // Bgm 클래스의 setVolume 메서드 수정
     public void setVolume(float volume) {
-        float minGain = volumeControl.getMinimum();
-        float maxGain = volumeControl.getMaximum();
-        float gainRange = maxGain - minGain;
-
-        float gain = (gainRange * volume / 100.0f) + minGain;
-        
-        if (gain < minGain) {
-            gain = minGain;
-        } else if (gain > maxGain) {
-            gain = maxGain;
-        }
-
-        volumeControl.setValue(gain);
+        float gain = (-0.20f * volume) + 20.5f;
+        volumeControl.setValue(-gain);
     }
-
 }
