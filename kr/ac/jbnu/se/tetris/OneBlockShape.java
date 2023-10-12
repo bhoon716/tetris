@@ -15,7 +15,7 @@ public class OneBlockShape { //블록의 모양을 나타내는 클래스
     }
 
     public void setOneBlockShape() {
-        coords[0][0] = 0;
+        coords[0][0] = 0; //
         coords[0][1] = 0;
         oneBlockShape = Tetrominoes.OneBlockShape;
     }

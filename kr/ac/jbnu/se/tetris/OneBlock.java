@@ -39,8 +39,6 @@ public class OneBlock extends Board {
 		curOneBlockY = 0; //새로운 블록의 y좌표
 
 		if (!tryOneBlockMove(curOneBlock, curOneBlockX, curOneBlockY)) { //새로운 위치로 블록을 이동할 수 없다면
-			curStatus = "Game Over";
-			stopGame(); //게임 정지
 		}
 	}
 
