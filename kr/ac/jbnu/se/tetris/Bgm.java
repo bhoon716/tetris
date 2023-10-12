@@ -1,13 +1,14 @@
 package kr.ac.jbnu.se.tetris;
 
 import javax.sound.sampled.*;
+
 import java.io.File;
 import java.io.IOException;
 
 public class Bgm {
     private Clip audioClip;
     private String audioFilePath = "kr/ac/jbnu/se/tetris/bgm.wav";
-    private FloatControl volumeControl; // 볼륨 조절 컨트롤
+    private FloatControl volumeControl;
 
     public Bgm() {
         try {
@@ -21,12 +22,12 @@ public class Bgm {
             // 데이터 라인을 열고 시작합니다.
             DataLine.Info info = new DataLine.Info(Clip.class, format);
             audioClip = (Clip) AudioSystem.getLine(info);
+            
             audioClip.open(audioStream);
 
             // 배경 음악을 무한 반복하도록 설정
             audioClip.loop(Clip.LOOP_CONTINUOUSLY);
 
-            // 볼륨 컨트롤 초기화
             volumeControl = (FloatControl) audioClip.getControl(FloatControl.Type.MASTER_GAIN);
 
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
@@ -52,19 +53,7 @@ public class Bgm {
 
     // Bgm 클래스의 setVolume 메서드 수정
     public void setVolume(float volume) {
-        float minGain = volumeControl.getMinimum();
-        float maxGain = volumeControl.getMaximum();
-        float gainRange = maxGain - minGain;
-
-        float gain = (gainRange * volume / 100.0f) + minGain;
-        
-        if (gain < minGain) {
-            gain = minGain;
-        } else if (gain > maxGain) {
-            gain = maxGain;
-        }
-
-        volumeControl.setValue(gain);
+        volume = volume / 100;
+        volumeControl.setValue(volume);
     }
-
 }

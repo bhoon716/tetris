@@ -9,7 +9,7 @@ public class MainMenu extends JPanel {
     private JButton[] modeButtons = new JButton[5];
     private JButton sprintButton = new JButton("스프린트 모드");
     private JButton timeattackButton = new JButton("타임어택 모드");
-    private JButton pentatrominoesButton = new JButton("펜타트로미노 모드");
+    private JButton sandBoxButton = new JButton("원 블럭 모드");
     private JButton achievementButton;
     private JButton settingButton;
     private JButton logoutButton;
@@ -42,15 +42,16 @@ public class MainMenu extends JPanel {
             }
         });
 
-        pentatrominoesButton.addActionListener(new ActionListener() {
+        sandBoxButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                tetris.switchPanel(new OneBlock(tetris));
             }
         });
 
         modePanel.add(sprintButton);
         modePanel.add(timeattackButton);
-        modePanel.add(pentatrominoesButton);
+        modePanel.add(sandBoxButton);
 
         // 아이콘 추가
         ImageIcon achievementIcon = new ImageIcon("achievement_icon.png"); // 아이콘 이미지 파일 경로로 수정
@@ -120,7 +121,7 @@ public class MainMenu extends JPanel {
                 tetris.switchPanel(new Achievement(tetris));
             } else if (buttonText.equals("설정")) {
                 // 설정 화면으로 이동하는 코드 추가
-            	 tetris.switchPanel(new SettingMenu(tetris));
+                tetris.switchPanel(new SettingMenu(tetris));
             }
         }
     };
