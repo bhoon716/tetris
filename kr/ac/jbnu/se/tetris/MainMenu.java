@@ -5,144 +5,116 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class MainMenu extends JPanel {
-    private Tetris tetris;
-    private JButton[] modeButtons = new JButton[5];
+    private JPanel topPanel = new JPanel(new BorderLayout());
+    private JPanel centerPanel = new JPanel(new GridLayout(4, 1, 10, 10));
+    private JPanel bottomPanel = new JPanel(new FlowLayout());
+    private JButton normalModeButton = new JButton("기본 모드");
     private JButton sprintButton = new JButton("스프린트 모드");
     private JButton timeattackButton = new JButton("타임어택 모드");
-    private JButton sandBoxButton = new JButton("원 블럭 모드");
-    private JButton achievementButton;
-    private JButton settingButton;
-    private JButton logoutButton;
-    private JLabel profileLabel;
-    
+    private JButton shadowModeButton = new JButton("고스트 모드");
+    private JButton achievementButton = new JButton("업적 관리");
+    private JButton settingButton = new JButton("설정");
+    private JButton logoutButton = new JButton("로그아웃");
+
     public MainMenu(Tetris tetris) {
-        this.tetris = tetris;
-        setLayout(new BorderLayout());
+        setLayout(new FlowLayout());
+        setBackground(Color.WHITE);
         
-        // 게임 모드 선택 버튼 배열 초기화
-        String[] modeNames = {"쉬운 모드", "보통 모드", "어려운 모드", "매우 어려운 모드", "갓 모드"};
-        JPanel modePanel = new JPanel(new GridLayout(4, 3, 10, 10)); // 간격 추가
-        modePanel.setBorder(BorderFactory.createTitledBorder("게임 모드 선택"));
-        for (int i = 0; i < modeButtons.length; i++) {
-            modeButtons[i] = createModeButton(modeNames[i]);
-            modePanel.add(modeButtons[i]);
-        }
 
-        sprintButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tetris.switchPanel(new SprintMode(tetris));
-            }
-        });
-        
-        timeattackButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tetris.switchPanel(new TimeAttackMode(tetris));
-            }
-        });
-
-        sandBoxButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tetris.switchPanel(new OneBlock(tetris));
-            }
-        });
-
-        modePanel.add(sprintButton);
-        modePanel.add(timeattackButton);
-        modePanel.add(sandBoxButton);
-
-        // 아이콘 추가
-        ImageIcon achievementIcon = new ImageIcon("achievement_icon.png"); // 아이콘 이미지 파일 경로로 수정
-        ImageIcon settingIcon = new ImageIcon("setting_icon.png"); // 아이콘 이미지 파일 경로로 수정
-        ImageIcon logoutIcon = new ImageIcon("logout_icon.png"); // 아이콘 이미지 파일 경로로 수정
-
-        achievementButton = createIconButton("업적 관리", achievementIcon, buttonListener);
-        settingButton = createIconButton("설정", settingIcon, buttonListener);
-        logoutButton = createIconButton("로그아웃", logoutIcon, logoutListener);
-
-        // 프로필 정보 표시 레이블 초기화
-        profileLabel = new JLabel("ID : " + tetris.getUserId() + " | 최고 기록 : " + tetris.getUserMaxScore());
-        profileLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-        // 버튼 패널 추가
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 10)); // 간격 추가
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        buttonPanel.add(achievementButton);
-        buttonPanel.add(settingButton);
-        buttonPanel.add(logoutButton);
-
-        // 모드 선택과 버튼 패널을 중앙에 배치
-        JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.add(modePanel, BorderLayout.CENTER);
-        centerPanel.add(buttonPanel, BorderLayout.SOUTH); // 하단에 배치
-
-        // 상단 로고 또는 메시지 패널 추가
-        JPanel topPanel = new JPanel(new BorderLayout());
+        // 타이틀 + 프로필 패널 (상단 패널)
+        // 타이틀 라벨
         JLabel title = new JLabel("테트리스", SwingConstants.CENTER);
-        title.setFont(new Font("맑은 고딕", Font.BOLD, 24)); // 폰트 및 크기 설정
+        title.setFont(new Font("맑은 고딕", Font.BOLD, 32));
+
+        // 프로필 라벨
+        JLabel profileLabel = new JLabel("ID : " + tetris.getUserId() + " | 최고 기록 : " + tetris.getUserMaxScore(), SwingConstants.CENTER);
+        profileLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+        
+        // 상단 패널에 타이틀과 프로필 라벨 추가
+        topPanel.setBackground(Color.WHITE);
+        topPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 10, 50));
         topPanel.add(title, BorderLayout.NORTH);
-        topPanel.add(profileLabel, BorderLayout.CENTER);
-
-        // 전체 패널에 추가
+        topPanel.add(profileLabel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
+
+
+        // 게임 모드 버튼 (중앙 패널)
+        // 기본 모드 버튼(+ 팝업 메뉴)
+        JPopupMenu difficultyPopupMenu = new JPopupMenu();
+        String[] difficulty = {"Easy", "Normal", "Hard", "Very Hard", "God"};
+        for(String diff : difficulty){
+            JMenuItem menuItem = new JMenuItem(diff);
+            menuItem.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e){
+                    System.out.println("노말 모드(" + diff + ") 선택됨");
+                    tetris.switchPanel(new Board(tetris, diff));
+                }
+            }); difficultyPopupMenu.add(menuItem);
+        }
+        normalModeButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e){
+                difficultyPopupMenu.show(normalModeButton, normalModeButton.getWidth() / 2, normalModeButton.getHeight());
+            }
+        }); centerPanel.add(setStyledButton(normalModeButton, 200, 40));
+
+        // 스프린트 모드 버튼
+        sprintButton.addActionListener(e -> {
+            System.out.println("스프린트 모드 선택됨");
+            tetris.switchPanel(new SprintMode(tetris));
+        }); centerPanel.add(setStyledButton(sprintButton, 200, 40));
+
+        // 타임어택 모드 버튼
+        timeattackButton.addActionListener(e -> {
+            System.out.println("타임어택 모드 선택됨");
+            tetris.switchPanel(new TimeAttackMode(tetris));
+        }); centerPanel.add(setStyledButton(timeattackButton, 200, 50));
+
+        // 그림자 모드 버튼
+        shadowModeButton.addActionListener(e -> {
+            System.out.println("고스트 모드 선택됨");
+            tetris.switchPanel(new GhostMode(tetris));
+        }); centerPanel.add(setStyledButton(shadowModeButton, 200, 50));
+
+        // 중앙 패널에 게임 모드 버튼 추가
+        centerPanel.setBackground(Color.WHITE);
+        centerPanel.setBorder(BorderFactory.createTitledBorder("게임 모드"));
+        centerPanel.setPreferredSize(new Dimension(250, 200));
         add(centerPanel, BorderLayout.CENTER);
+
+
+        // 업적 관리, 설정, 로그아웃 버튼 (하단 패널)
+        // 업적 관리 버튼
+        achievementButton.addActionListener(e -> {
+            System.out.println("업적 관리 선택됨");
+            tetris.switchPanel(new AchievementMenu(tetris));
+        }); bottomPanel.add(setStyledButton(achievementButton, 100, 40));
+
+        // 설정 버튼
+        settingButton.addActionListener(e -> {
+            System.out.println("설정 선택됨");
+            tetris.switchPanel(new SettingMenu(tetris));
+        }); bottomPanel.add(setStyledButton(settingButton, 100, 40));
+
+        // 로그아웃 버튼
+        logoutButton.addActionListener(e -> {
+            System.out.println("로그아웃 선택됨");
+            tetris.switchPanel(new Login(tetris));
+        }); bottomPanel.add(setStyledButton(logoutButton, 100, 40));
+
+        // 하단 패널에 버튼 추가
+        bottomPanel.setBackground(Color.WHITE);
+        bottomPanel.setPreferredSize(new Dimension(350, 60));
+        add(bottomPanel, BorderLayout.SOUTH);
     }
 
-    // 게임 모드 선택 버튼 생성 메서드
-    private JButton createModeButton(String text) {
-        JButton button = new JButton(text);
-        button.setPreferredSize(new Dimension(200, 60)); // 버튼 크기 조정
-        button.addActionListener(modeButtonListener);
-        return button;
-    }
-
-    // 게임 모드 선택 버튼 리스너
-    ActionListener modeButtonListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JButton clickedButton = (JButton) e.getSource();
-            String modeName = clickedButton.getText();
-            System.out.println(modeName + " 선택됨");
-            // 선택한 모드에 따라 게임 시작 로직 추가
-            tetris.switchPanel(new Board(tetris, modeName));
-        }
-    };
-
-    // 버튼 클릭 리스너
-    ActionListener buttonListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JButton clickedButton = (JButton) e.getSource();
-            String buttonText = clickedButton.getText();
-            // 버튼마다의 동작 추가
-            if (buttonText.equals("업적 관리")) {
-                tetris.switchPanel(new Achievement(tetris));
-            } else if (buttonText.equals("설정")) {
-                // 설정 화면으로 이동하는 코드 추가
-                tetris.switchPanel(new SettingMenu(tetris));
-            }
-        }
-    };
-
-    // 로그아웃 버튼 리스너
-    ActionListener logoutListener = new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int choice = JOptionPane.showConfirmDialog(MainMenu.this, "로그아웃 하시겠습니까?", "로그아웃 확인", JOptionPane.YES_NO_OPTION);
-            if (choice == JOptionPane.YES_OPTION) {
-                tetris.switchPanel(new Login(tetris));
-            }
-        }
-    };
-
-    // 아이콘과 텍스트가 함께 표시되는 버튼 생성 메서드
-    private JButton createIconButton(String text, ImageIcon icon, ActionListener listener) {
-        JButton button = new JButton(text, icon);
-        button.setPreferredSize(new Dimension(200, 40)); // 버튼 크기 조정
-        button.setHorizontalTextPosition(SwingConstants.RIGHT);
-        button.addActionListener(listener);
+    private JButton setStyledButton(JButton button, int width, int height){
+        button.setPreferredSize(new Dimension(width, height));
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("맑은 고딕", Font.BOLD, 13));
+        button.setFocusPainted(false);
         return button;
     }
 }

@@ -11,7 +11,7 @@ import static java.awt.event.KeyEvent.VK_ESCAPE;
 
 public class Board extends JPanel implements ActionListener {
 	private Tetris tetris;
-	protected Bgm bgm = new Bgm(); //배경음악 객체
+	protected Bgm bgm;
 
 	protected final int BoardWidth = 10; //게임 보드의 가로 칸 수
 	protected final int BoardHeight = 22; //게임 보드의 세로 칸 수
@@ -25,15 +25,15 @@ public class Board extends JPanel implements ActionListener {
 	protected int curX = 0; //현재 블록의 x좌표
 	protected int curY = 0; //현재 블록의 y좌표
 	protected Shape curPiece; //현재 블록을 나타내는 객체
-	protected Tetrominoes[] board; //게임 보드를 나타내는 배열
+	protected Tetrominoes[] board = new Tetrominoes[BoardWidth * BoardHeight]; //게임 보드를 나타내는 배열 생성
 	protected int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
 	protected int combo = 0;
 	protected int score = 0;
 	protected String curStatus = "";
 	private String modeName = "";
-	private JLabel scoreLabel = new JLabel("Score : " + score);
-	private JLabel statusLabel = new JLabel(curStatus);
-	private JLabel comboLabel = new JLabel("Combo : " + combo);
+	protected JLabel scoreLabel = new JLabel("Score : " + score);
+	protected JLabel statusLabel = new JLabel(curStatus);
+	protected JLabel comboLabel = new JLabel("Combo : " + combo);
 	protected JPanel statusPanel = new JPanel();
 	private JPanel nextBlockPanel = new JPanel();
 	private JPanel holdBlockPanel = new JPanel();
@@ -49,11 +49,11 @@ public class Board extends JPanel implements ActionListener {
 		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
 		setPreferredSize(new Dimension(250, 400));
 		curPiece = new Shape(); //현재 블록을 생성(NoShape)
+		bgm = new Bgm();
 		timer = new Timer(getTimerDelay(modeName), this); //타이머 생성(400ms마다 actionPerformed()를 호출)
 		bgm.setVolume(tetris.getBgmVolume());
 		bgm.play(); //배경음악 재생
 		timer.start(); //타이머 시작
-		board = new Tetrominoes[BoardWidth * BoardHeight]; //게임 보드를 나타내는 배열 생성
 		clearBoard(); //게임 보드를 초기화
 		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
 		start();
@@ -120,17 +120,18 @@ public class Board extends JPanel implements ActionListener {
 
 	private int getTimerDelay(String modeName) {
 		switch (modeName) {
-			case "쉬운 모드":
+			case "Easy":
 			case "스프린트 모드":
 			case "타임어택 모드":
-				return 400;
-			case "보통 모드":
+			case "그림자 모드":
+				return 500;
+			case "Normal":
+				return 300;
+			case "Hard":
 				return 200;
-			case "어려운 모드":
-				return 100;
-			case "매우 어려운 모드":
-				return 70;
-			case "갓 모드":
+			case "Very Hard":
+				return 80;
+			case "God":
 				return 30;
 			default:
 				return 400;
@@ -192,9 +193,9 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	private void restart() {
-		pause();
 		int choice = JOptionPane.showConfirmDialog(this, "게임을 재시작하시겠습니까?", "게임 재시작 확인", JOptionPane.YES_NO_OPTION);
 		if (choice == JOptionPane.YES_OPTION) {
+			timer.start();
 			score = 0;
 			curStatus = modeName;
 			bgm.replay();
@@ -203,8 +204,10 @@ public class Board extends JPanel implements ActionListener {
 			setFocusable(true);  // Set the focus on the game panel
 			requestFocusInWindow(); // Request focus for the game panel
 		} else {
+			removePauseScreen();
 			pause();
 		}
+		isPaused = false;
 	}
 
 	protected void stopGame() {
@@ -239,7 +242,7 @@ public class Board extends JPanel implements ActionListener {
 		updateScorePanel();
 	}
 
-	private void updateScorePanel() {
+	protected void updateScorePanel() {
 		statusLabel.setText(curStatus);
 		scoreLabel.setText("Score : " + score);
 		comboLabel.setText("Combo : " + combo);
@@ -370,7 +373,7 @@ public class Board extends JPanel implements ActionListener {
 		return numLinesRemoved;
 	}
 
-	private void drawSquare(Graphics g, int x, int y, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
+	protected void drawSquare(Graphics g, int x, int y, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
 		Color colors[] = {new Color(0, 0, 0), new Color(204, 102, 102), new Color(102, 204, 102), //색상 배열(RGB)
 				new Color(102, 102, 204), new Color(204, 204, 102), new Color(204, 102, 204), new Color(102, 204, 204),
 				new Color(218, 170, 0)};
@@ -415,7 +418,7 @@ public class Board extends JPanel implements ActionListener {
 				"[모드 설명]\n" +
 				"스프린트: 40줄을 최대한 빠른 시간 안에 지우는 모드\n" +
 				"타임어택: 2분 동안 많은 줄을 제거하는 모드\n" +
-				"펜타트로미노: 5개짜리 블록이 추가된 모드\n\n" +
+				"고스트: 고스트만 보이는 모드\n\n" +
 				"[단축키]\n" +
 				"방향 키: 블록 회전\n" +
 				"ESC: 일시정지\n"+
@@ -432,7 +435,7 @@ public class Board extends JPanel implements ActionListener {
 			// Create a semi-transparent panel to dim the screen
 			JPanel dimPanel = new JPanel();
 			dimPanel.setBackground(new Color(0, 0, 0, 142));
-			dimPanel.setBounds(0, 0, BoardWidth * squareWidth(),BoardHeight* squareHeight());
+			dimPanel.setBounds(0, 0, (int) getSize().getWidth() / 2, (int) getSize().getHeight());
 
 			JLabel pausedLabel = new JLabel("PAUSED");
 			pausedLabel.setFont(new Font("배달의민족한나AirOTF", Font.BOLD | Font.ITALIC ,30));

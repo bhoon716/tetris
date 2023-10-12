@@ -28,4 +28,12 @@ public class SprintMode extends Board{
             // 최단 클리어 타임을 player 객체에 저장하는 코드 작성
         }
 	}
+
+    // 남은 줄을 출력하는 메소드
+    @Override
+    protected void updateScorePanel() {
+        statusLabel.setText(curStatus);
+        scoreLabel.setText("남은 줄 : " + (LINE_TO_CLEAR - numLinesRemoved));
+        comboLabel.setText("Combo : " + combo);
+    }
 }

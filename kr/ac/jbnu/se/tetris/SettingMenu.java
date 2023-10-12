@@ -7,13 +7,10 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class SettingMenu extends JPanel {
-    private Tetris tetris;
     private JSlider volumeSlider;
 
     public SettingMenu(Tetris tetris) {
-        this.tetris = tetris;
-
-        setLayout(new BorderLayout());
+        setLayout(new FlowLayout());
 
         // 볼륨 조절 슬라이더 생성
         volumeSlider = new JSlider(JSlider.HORIZONTAL, 0, 100, tetris.getBgmVolume()); // 볼륨 범위를 0에서 100으로 설정하고 기본값을 50으로 설정
@@ -34,14 +31,17 @@ public class SettingMenu extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // 설정을 저장하고 설정 메뉴를 닫도록 구현
-                //saveSettings(); // 설정 저장 메서드 호출
+                System.out.println("볼륨 설정 : " + tetris.getBgmVolume());
                 tetris.switchPanel(new MainMenu(tetris)); // 메인 메뉴로 이동
             }
         });
 
         // 설정 메뉴에 슬라이더와 저장 버튼을 추가
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 1));
+        JLabel volumeLabel = new JLabel("볼륨", SwingConstants.CENTER);
+        volumeLabel.setFont(new Font("맑은 고딕", Font.BOLD, 18));
+        panel.setLayout(new GridLayout(3, 1));
+        panel.add(volumeLabel);
         panel.add(volumeSlider);
         panel.add(saveButton);
 
