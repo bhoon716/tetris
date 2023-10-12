@@ -2,7 +2,12 @@ package kr.ac.jbnu.se.tetris;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 import javax.swing.*;
+
+import static java.awt.event.KeyEvent.VK_ESCAPE;
 
 public class Board extends JPanel implements ActionListener {
 	private Tetris tetris;
@@ -10,7 +15,7 @@ public class Board extends JPanel implements ActionListener {
 
 	protected final int BoardWidth = 10; //게임 보드의 가로 칸 수
 	protected final int BoardHeight = 22; //게임 보드의 세로 칸 수
-	
+
 	private Timer timer; //게임의 속도를 조절하는 타이머
 	protected long startTime; //게임 시작 시간을 저장하는 변수
 	private boolean isFallingFinished = false; //현재 블록이 다 떨어졌는지 확인하는 변수
@@ -34,11 +39,13 @@ public class Board extends JPanel implements ActionListener {
 	private JPanel holdBlockPanel = new JPanel();
 	private JPanel rightPanel = new JPanel();
 	private JButton backButton = new JButton("Back");
-	
+
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
 		this.modeName = modeName;
 		this.curStatus = modeName;
+		setFocusable(true);  // Allow the Board component to receive focus
+		requestFocusInWindow();
 		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
 		setPreferredSize(new Dimension(250, 400));
 		curPiece = new Shape(); //현재 블록을 생성(NoShape)
@@ -49,22 +56,22 @@ public class Board extends JPanel implements ActionListener {
 		clearBoard(); //게임 보드를 초기화
 		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
 		start();
-		
+
 		statusPanel.setPreferredSize(new Dimension(190, 400));
 		statusPanel.setLayout(new FlowLayout());
 		statusPanel.setBackground(Color.ORANGE);
 		add(statusPanel, BorderLayout.EAST);
 
-		nextBlockPanel.setPreferredSize(new Dimension(100,100));
+		nextBlockPanel.setPreferredSize(new Dimension(100, 100));
 		nextBlockPanel.setBackground(Color.YELLOW);
 
-		holdBlockPanel.setPreferredSize(new Dimension(100,100));
+		holdBlockPanel.setPreferredSize(new Dimension(100, 100));
 		holdBlockPanel.setBackground(Color.GREEN);
 
 		statusPanel.add(nextBlockPanel, BorderLayout.NORTH);
 		statusPanel.add(holdBlockPanel, BorderLayout.CENTER);
 		statusPanel.add(rightPanel, BorderLayout.SOUTH);
-		
+
 		rightPanel.setPreferredSize(new Dimension(120, 50));
 		rightPanel.setLayout(new BorderLayout());
 		rightPanel.setBackground(Color.RED);
@@ -73,7 +80,7 @@ public class Board extends JPanel implements ActionListener {
 		rightPanel.add(comboLabel, BorderLayout.SOUTH);
 		backButton.setPreferredSize(new Dimension(100, 30));
 		backButton.addActionListener(e -> backButtonListener());
-        statusPanel.add(backButton, BorderLayout.SOUTH);
+		statusPanel.add(backButton, BorderLayout.SOUTH);
 	}
 
 	@Override
@@ -87,30 +94,30 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
 
-	public void backButtonListener(){
+	public void backButtonListener() {
 		bgm.stop(); //배경음악 정지
 		tetris.switchPanel(new MainMenu(tetris)); // 메인 메뉴 화면으로 전환
 	}
 
 	private void drawGhost(Graphics g, int curX, int curY, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
-		if(curPiece.getShape() == Tetrominoes.NoShape)
+		if (curPiece.getShape() == Tetrominoes.NoShape)
 			return;
-			
+
 		int newY = curY;
-		while(newY > 0){
-			if(!ghostTryMove(curPiece, curX, newY-1))
+		while (newY > 0) {
+			if (!ghostTryMove(curPiece, curX, newY - 1))
 				break;
 			--newY;
 		}
-		for(int i=0; i<4; ++i){
+		for (int i = 0; i < 4; ++i) {
 			int x = curX + curPiece.x(i);
 			int y = newY - curPiece.y(i);
 			g.fillRect(0 + x * squareWidth(), boardTop + (BoardHeight - y - 1) * squareHeight(), squareWidth(), squareHeight());
 		}
 	}
 
-	private int getTimerDelay(String modeName){
-		switch(modeName){
+	private int getTimerDelay(String modeName) {
+		switch (modeName) {
 			case "쉬운 모드":
 			case "스프린트 모드":
 			case "타임어택 모드":
@@ -149,7 +156,7 @@ public class Board extends JPanel implements ActionListener {
 		isFallingFinished = false; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 false로 설정
 		numLinesRemoved = 0; //제거된 줄의 수를 0으로 설정
 		clearBoard(); //게임 보드를 초기화
-		
+
 
 		newPiece(); //새로운 블록을 생성
 		timer.start(); //타이머 시작
@@ -164,6 +171,7 @@ public class Board extends JPanel implements ActionListener {
 			timer.stop(); //타이머 정지
 			curStatus = modeName + " (Paused)";
 			bgm.stop();
+			pauseScreen();
 		} else { //게임이 일시정지되지 않았다면
 			timer.start(); //타이머 시작
 			curStatus = modeName;
@@ -172,23 +180,34 @@ public class Board extends JPanel implements ActionListener {
 		repaint(); //게임 보드를 다시 그림
 	}
 
-	private void restart(){ //게임을 재시작하는 메소드
+	public void resume() {
+		pause();
+		timer.start();
+		curStatus = modeName;
+		bgm.play();
+		removePauseScreen();
+		setFocusable(true);  // Set the focus on the game panel
+		requestFocusInWindow(); // Request focus for the game panel
+	}
+
+	private void restart() {
 		pause();
 		int choice = JOptionPane.showConfirmDialog(this, "게임을 재시작하시겠습니까?", "게임 재시작 확인", JOptionPane.YES_NO_OPTION);
-		if(choice == JOptionPane.YES_OPTION){
-			pause();
+		if (choice == JOptionPane.YES_OPTION) {
 			score = 0;
 			curStatus = modeName;
 			bgm.replay();
+			removePauseScreen();
 			start();
-		}
-		else{
+			setFocusable(true);  // Set the focus on the game panel
+			requestFocusInWindow(); // Request focus for the game panel
+		} else {
 			pause();
 		}
 	}
 
-	protected void stopGame(){
-		curPiece.setShape(Tetrominoes.NoShape); //현재 블록의 모양을 NoShape(없음)으로 설정 
+	protected void stopGame() {
+		curPiece.setShape(Tetrominoes.NoShape); //현재 블록의 모양을 NoShape(없음)으로 설정
 		isStarted = false;
 		timer.stop(); //타이머 정지
 		bgm.stop();
@@ -220,7 +239,7 @@ public class Board extends JPanel implements ActionListener {
 		updateScorePanel();
 	}
 
-	private void updateScorePanel(){
+	private void updateScorePanel() {
 		statusLabel.setText(curStatus);
 		scoreLabel.setText("Score : " + score);
 		comboLabel.setText("Combo : " + combo);
@@ -278,10 +297,10 @@ public class Board extends JPanel implements ActionListener {
 		for (int i = 0; i < 4; ++i) { //새로운 블록의 모든 칸에 대해
 			int x = newX + newPiece.x(i); //새로운 블록의 x좌표
 			int y = newY - newPiece.y(i); //새로운 블록의 y좌표
-			if((x < 0) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 왼쪽 벽을 넘어간다면
-				tryMove(newPiece, newX+1, newY); //새로운 블록을 오른쪽으로 한 칸 이동
-			if((x >= BoardWidth) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 오른쪽 벽을 넘어간다면
-				tryMove(newPiece, newX-1, newY); //새로운 블록을 왼쪽으로 한 칸 이동
+			if ((x < 0) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 왼쪽 벽을 넘어간다면
+				tryMove(newPiece, newX + 1, newY); //새로운 블록을 오른쪽으로 한 칸 이동
+			if ((x >= BoardWidth) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 오른쪽 벽을 넘어간다면
+				tryMove(newPiece, newX - 1, newY); //새로운 블록을 왼쪽으로 한 칸 이동
 			if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) //새로운 블록이 게임 보드의 범위를 벗어난다면
 				return false; //false 반환
 			if (shapeAt(x, y) != Tetrominoes.NoShape) //새로운 블록이 게임 보드의 다른 블록과 겹친다면 = 새로운 x, y에 블록이 존재한다면
@@ -295,8 +314,8 @@ public class Board extends JPanel implements ActionListener {
 		return true; //true 반환
 	}
 
-	private boolean ghostTryMove(Shape newPiece, int newX, int newY){
-		for(int i=0; i<4; ++i){
+	private boolean ghostTryMove(Shape newPiece, int newX, int newY) {
+		for (int i = 0; i < 4; ++i) {
 			int x = newX + newPiece.x(i); //새로운 블록의 x좌표
 			int y = newY - newPiece.y(i); //새로운 블록의 y좌표
 			if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) //새로운 블록이 게임 보드의 범위를 벗어난다면
@@ -311,17 +330,17 @@ public class Board extends JPanel implements ActionListener {
 	protected void removeFullLines() {
 		int numFullLines = 0;
 		int comboScore = 0;
-	
+
 		for (int i = BoardHeight - 1; i >= 0; --i) {
 			boolean lineIsFull = true;
-	
+
 			for (int j = 0; j < BoardWidth; ++j) {
 				if (shapeAt(j, i) == Tetrominoes.NoShape) {
 					lineIsFull = false;
 					break;
 				}
 			}
-	
+
 			if (lineIsFull) {
 				++numFullLines;
 				for (int k = i; k < BoardHeight - 1; ++k) {
@@ -331,20 +350,20 @@ public class Board extends JPanel implements ActionListener {
 			}
 		}
 
-		if(numFullLines > 0){
+		if (numFullLines > 0) {
 			combo += numFullLines;
 			numLinesRemoved += numFullLines;
 			isFallingFinished = true;
 			curPiece.setShape(Tetrominoes.NoShape);
 			repaint();
-		} else{
+		} else {
 			combo = 0;
 		}
 
-		if(combo > 1){
+		if (combo > 1) {
 			comboScore = 50 * combo;
 		}
-		score += 100 * numFullLines + comboScore;		
+		score += 100 * numFullLines + comboScore;
 	}
 
 	public int getLineCount() {
@@ -352,9 +371,9 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	private void drawSquare(Graphics g, int x, int y, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
-		Color colors[] = { new Color(0, 0, 0), new Color(204, 102, 102), new Color(102, 204, 102), //색상 배열(RGB)
+		Color colors[] = {new Color(0, 0, 0), new Color(204, 102, 102), new Color(102, 204, 102), //색상 배열(RGB)
 				new Color(102, 102, 204), new Color(204, 204, 102), new Color(204, 102, 204), new Color(102, 204, 204),
-				new Color(218, 170, 0) };
+				new Color(218, 170, 0)};
 
 		Color color = colors[shape.ordinal()]; //블록의 모양에 따라 색상을 정함
 
@@ -373,7 +392,7 @@ public class Board extends JPanel implements ActionListener {
 	private void addBkgImg(Graphics g) {
 		ImageIcon bkgImg = new ImageIcon("kr/ac/jbnu/se/tetris/image/background.jpg");
 		Image bkgImg1 = bkgImg.getImage();
-		g.drawImage(bkgImg1, 0, 0, getWidth()/2, getHeight(), this);
+		g.drawImage(bkgImg1, 0, 0, getWidth() / 2, getHeight(), this);
 	}
 
 	private void drawGridPattern(Graphics g) { //격자를 그리는 메소드
@@ -390,17 +409,87 @@ public class Board extends JPanel implements ActionListener {
 		}
 	}
 
+	public void helpScreen() {
+		String msg =
+				"다양한 난이도와 모드를 지원하는 테트리스 게임입니다.\n\n" +
+				"[모드 설명]\n" +
+				"스프린트: 40줄을 최대한 빠른 시간 안에 지우는 모드\n" +
+				"타임어택: 2분 동안 많은 줄을 제거하는 모드\n" +
+				"펜타트로미노: 5개짜리 블록이 추가된 모드\n\n" +
+				"[단축키]\n" +
+				"방향 키: 블록 회전\n" +
+				"ESC: 일시정지\n"+
+				"Space: 하드 드롭\n"+
+				"D: 소프트 드롭";
+
+		JOptionPane.showMessageDialog(this, msg, "도움말", JOptionPane.INFORMATION_MESSAGE);
+	}
+	public void pauseScreen() {
+		if (isPaused) {
+			JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+			JLayeredPane layeredPane = topFrame.getLayeredPane();
+
+			// Create a semi-transparent panel to dim the screen
+			JPanel dimPanel = new JPanel();
+			dimPanel.setBackground(new Color(0, 0, 0, 142));
+			dimPanel.setBounds(0, 0, BoardWidth * squareWidth(),BoardHeight* squareHeight());
+
+			JLabel pausedLabel = new JLabel("PAUSED");
+			pausedLabel.setFont(new Font("배달의민족한나AirOTF", Font.BOLD | Font.ITALIC ,30));
+			pausedLabel.setForeground(Color.WHITE);
+			pausedLabel.setHorizontalAlignment(JLabel.CENTER);
+			pausedLabel.setVerticalAlignment(JLabel.CENTER);
+
+			JButton resumeButton = new JButton("돌아가기");
+			JButton restartButton = new JButton("다시 시작");
+			JButton helpButton = new JButton("도움말");
+
+			resumeButton.addActionListener(e -> {
+				resume();
+				backButton.setFocusable(false);
+			});
+			restartButton.addActionListener(e -> restart());
+			helpButton.addActionListener(e -> helpScreen());
+
+			resumeButton.setBounds(50, 200, 100, 30);
+			restartButton.setBounds(50, 250, 100, 30);
+			helpButton.setBounds(50, 300, 100, 30);
+
+			dimPanel.add(pausedLabel);
+			dimPanel.add(resumeButton);
+			dimPanel.add(restartButton);
+			dimPanel.add(helpButton);
+
+			layeredPane.add(dimPanel,JLayeredPane.PALETTE_LAYER);
+		}
+		if(!isPaused) removePauseScreen();
+	}
+	public void removePauseScreen() {
+		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+		JLayeredPane layeredPane = topFrame.getLayeredPane();
+		Component[] components = layeredPane.getComponentsInLayer(JLayeredPane.PALETTE_LAYER);
+
+		for (Component component : components) {
+			if (component instanceof JPanel) {
+				JPanel panel = (JPanel) component;
+				panel.removeAll();
+				layeredPane.remove(panel);
+			}
+		}
+		layeredPane.validate();
+		layeredPane.repaint();
+	}
+
 
 	class TAdapter extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
 			int keycode = e.getKeyCode();
 
-			if (keycode == 'p' || keycode == 'P') {
+			if (keycode == VK_ESCAPE) {
+				if (isPaused) {
+					return;
+				}
 				pause();
-				return;
-			}
-
-			if (isPaused) {
 				return;
 			}
 
@@ -424,10 +513,6 @@ public class Board extends JPanel implements ActionListener {
 				case 'D':
 					oneLineDown();
 					break; // 소프트 드롭 (D)
-				case 'r':
-				case 'R':
-					restart();
-					break; // 게임 재시작 (R)
 			}
 		}
 	}
