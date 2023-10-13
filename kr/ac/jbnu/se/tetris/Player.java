@@ -6,13 +6,17 @@ public class Player {
     private int maxScore = 0;
     private int maxCombo = 0;
     private int level = 0;
+    private int exp = 0;
+    private int itemReserves = 0;
     private AchievementList achievementList;
     
-    public Player(String userId, int maxScore, int maxCombo, int level, AchievementList achievementList) {
+    public Player(String userId, int maxScore, int maxCombo, int level, int exp, int itemReserves, AchievementList achievementList) {
         this.userId = userId;
         this.maxScore = maxScore;
         this.maxCombo = maxCombo;
         this.level = level;
+        this.exp = exp;
+        this.itemReserves = itemReserves;
         this.achievementList = achievementList;
     }
 
@@ -31,6 +35,10 @@ public class Player {
     public int getLevel() {
         return level;
     }
+
+    public int getExp() { return exp; }
+
+    public int getItemReserves() { return itemReserves; }
 
     public AchievementList getAchievementList() {
         return achievementList;
@@ -51,6 +59,12 @@ public class Player {
     public void setLevel(int level) {
         this.level = level;
     }
+
+    public void setExp(int exp) { this.exp = exp; }
+
+    public void setItemReserves(int itemReserves) { this.itemReserves = itemReserves; }
+
+
 
     public void setAchievementList(AchievementList achievementList) {
         this.achievementList = achievementList;

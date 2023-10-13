@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import javax.swing.*;
+import java.util.Random;
 
 import static java.awt.event.KeyEvent.VK_ESCAPE;
 
@@ -102,7 +103,7 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	protected void drawGhost(Graphics g, int curX, int curY, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
-		if(curPiece.getShape() == Tetrominoes.NoShape)
+		if (curPiece.getShape() == Tetrominoes.NoShape)
 			return;
 
 		int newY = curY;
@@ -111,7 +112,7 @@ public class Board extends JPanel implements ActionListener {
 				break;
 			--newY;
 		}
-		for(int i=0; i<4; ++i){
+		for (int i = 0; i < 4; ++i) {
 			int x = curX + curPiece.getX(i);
 			int y = newY - curPiece.getY(i);
 			g.fillRect(0 + x * squareWidth(), boardTop + (BoardHeight - y - 1) * squareHeight(), squareWidth(), squareHeight());
@@ -159,7 +160,7 @@ public class Board extends JPanel implements ActionListener {
 		isFallingFinished = false; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 false로 설정
 		numLinesRemoved = 0; //제거된 줄의 수를 0으로 설정
 		clearBoard(); //게임 보드를 초기화
-		
+
 		newPiece(); //새로운 블록을 생성
 		timer.start(); //타이머 시작
 	}
@@ -195,19 +196,15 @@ public class Board extends JPanel implements ActionListener {
 	private void restart() {
 		int choice = JOptionPane.showConfirmDialog(this, "게임을 재시작하시겠습니까?", "게임 재시작 확인", JOptionPane.YES_NO_OPTION);
 		if (choice == JOptionPane.YES_OPTION) {
-			timer.start();
 			score = 0;
 			curStatus = modeName;
 			bgm.replay();
 			removePauseScreen();
+			isPaused = false;
 			start();
 			setFocusable(true);  // Set the focus on the game panel
 			requestFocusInWindow(); // Request focus for the game panel
-		} else {
-			removePauseScreen();
-			pause();
 		}
-		isPaused = false;
 	}
 
 	protected void stopGame() {
@@ -300,10 +297,10 @@ public class Board extends JPanel implements ActionListener {
 		for (int i = 0; i < 4; ++i) { //새로운 블록의 모든 칸에 대해
 			int x = newX + newPiece.getX(i); //새로운 블록의 x좌표
 			int y = newY - newPiece.getY(i); //새로운 블록의 y좌표
-			if((x < 0) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 왼쪽 벽을 넘어간다면
-				tryMove(newPiece, newX+1, newY); //새로운 블록을 오른쪽으로 한 칸 이동
-			if((x >= BoardWidth) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 오른쪽 벽을 넘어간다면
-				tryMove(newPiece, newX-1, newY); //새로운 블록을 왼쪽으로 한 칸 이동
+			if ((x < 0) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 왼쪽 벽을 넘어간다면
+				tryMove(newPiece, newX + 1, newY); //새로운 블록을 오른쪽으로 한 칸 이동
+			if ((x >= BoardWidth) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 오른쪽 벽을 넘어간다면
+				tryMove(newPiece, newX - 1, newY); //새로운 블록을 왼쪽으로 한 칸 이동
 			if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) //새로운 블록이 게임 보드의 범위를 벗어난다면
 				return false; //false 반환
 			if (shapeAt(x, y) != Tetrominoes.NoShape) //새로운 블록이 게임 보드의 다른 블록과 겹친다면 = 새로운 x, y에 블록이 존재한다면
@@ -317,8 +314,8 @@ public class Board extends JPanel implements ActionListener {
 		return true; //true 반환
 	}
 
-	private boolean ghostTryMove(Shape newPiece, int newX, int newY){
-		for(int i=0; i<4; ++i){
+	private boolean ghostTryMove(Shape newPiece, int newX, int newY) {
+		for (int i = 0; i < 4; ++i) {
 			int x = newX + newPiece.getX(i); //새로운 블록의 x좌표
 			int y = newY - newPiece.getY(i); //새로운 블록의 y좌표
 			if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) //새로운 블록이 게임 보드의 범위를 벗어난다면
@@ -415,18 +412,19 @@ public class Board extends JPanel implements ActionListener {
 	public void helpScreen() {
 		String msg =
 				"다양한 난이도와 모드를 지원하는 테트리스 게임입니다.\n\n" +
-				"[모드 설명]\n" +
-				"스프린트: 40줄을 최대한 빠른 시간 안에 지우는 모드\n" +
-				"타임어택: 2분 동안 많은 줄을 제거하는 모드\n" +
-				"고스트: 고스트만 보이는 모드\n\n" +
-				"[단축키]\n" +
-				"방향 키: 블록 회전\n" +
-				"ESC: 일시정지\n"+
-				"Space: 하드 드롭\n"+
-				"D: 소프트 드롭";
+						"[모드 설명]\n" +
+						"스프린트: 40줄을 최대한 빠른 시간 안에 지우는 모드\n" +
+						"타임어택: 2분 동안 많은 줄을 제거하는 모드\n" +
+						"고스트: 고스트만 보이는 모드\n\n" +
+						"[단축키]\n" +
+						"방향 키: 블록 회전\n" +
+						"ESC: 일시정지\n" +
+						"Space: 하드 드롭\n" +
+						"D: 소프트 드롭";
 
 		JOptionPane.showMessageDialog(this, msg, "도움말", JOptionPane.INFORMATION_MESSAGE);
 	}
+
 	public void pauseScreen() {
 		if (isPaused) {
 			JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -438,7 +436,7 @@ public class Board extends JPanel implements ActionListener {
 			dimPanel.setBounds(0, 0, (int) getSize().getWidth() / 2, (int) getSize().getHeight());
 
 			JLabel pausedLabel = new JLabel("PAUSED");
-			pausedLabel.setFont(new Font("배달의민족한나AirOTF", Font.BOLD | Font.ITALIC ,30));
+			pausedLabel.setFont(new Font("배달의민족한나AirOTF", Font.BOLD | Font.ITALIC, 30));
 			pausedLabel.setForeground(Color.WHITE);
 			pausedLabel.setHorizontalAlignment(JLabel.CENTER);
 			pausedLabel.setVerticalAlignment(JLabel.CENTER);
@@ -463,10 +461,11 @@ public class Board extends JPanel implements ActionListener {
 			dimPanel.add(restartButton);
 			dimPanel.add(helpButton);
 
-			layeredPane.add(dimPanel,JLayeredPane.PALETTE_LAYER);
+			layeredPane.add(dimPanel, JLayeredPane.PALETTE_LAYER);
 		}
-		if(!isPaused) removePauseScreen();
+		if (!isPaused) removePauseScreen();
 	}
+
 	public void removePauseScreen() {
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 		JLayeredPane layeredPane = topFrame.getLayeredPane();
@@ -516,6 +515,11 @@ public class Board extends JPanel implements ActionListener {
 				case 'D':
 					oneLineDown();
 					break; // 소프트 드롭 (D)
+				case 'i':
+				case 'I':
+					Item item = new Item(Board.this);
+					item.useItem();
+					break; // 아이템 사용 (I)
 			}
 		}
 	}
