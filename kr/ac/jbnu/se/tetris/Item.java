@@ -1,8 +1,10 @@
 package kr.ac.jbnu.se.tetris;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Random;
 
-public class Item {
+public class Item{
     public Board board;
     private Random random = new Random();
 
@@ -12,8 +14,11 @@ public class Item {
 
     // 아이템 사용 메소드
     public void useItem() {
-        addScore();
-        removeAllBlocks();
+        if (Player.getItemReserves() > 0) {
+            addScore();
+            removeAllBlocks();
+            Player.subItemReserves();
+        }
     }
 
     // 점수를 추가하는 메소드
