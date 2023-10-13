@@ -2,11 +2,8 @@ package kr.ac.jbnu.se.tetris;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
+import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.util.Random;
 
 import static java.awt.event.KeyEvent.VK_ESCAPE;
 
@@ -40,6 +37,8 @@ public class Board extends JPanel implements ActionListener {
 	private JPanel holdBlockPanel = new JPanel();
 	private JPanel rightPanel = new JPanel();
 	private JButton backButton = new JButton("Back");
+	private JButton itemReservesButton = new JButton(Player.getItemReserves() + "개");
+	private Item item = new Item(this);
 
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
@@ -73,6 +72,8 @@ public class Board extends JPanel implements ActionListener {
 		statusPanel.add(nextBlockPanel, BorderLayout.NORTH);
 		statusPanel.add(holdBlockPanel, BorderLayout.CENTER);
 		statusPanel.add(rightPanel, BorderLayout.SOUTH);
+		statusPanel.add(backButton, BorderLayout.SOUTH);
+		if(Player.getItemReserves() > 0) statusPanel.add(itemReservesButton, BorderLayout.SOUTH);
 
 		rightPanel.setPreferredSize(new Dimension(120, 50));
 		rightPanel.setLayout(new BorderLayout());
@@ -82,7 +83,19 @@ public class Board extends JPanel implements ActionListener {
 		rightPanel.add(comboLabel, BorderLayout.SOUTH);
 		backButton.setPreferredSize(new Dimension(100, 30));
 		backButton.addActionListener(e -> backButtonListener());
-		statusPanel.add(backButton, BorderLayout.SOUTH);
+		itemReservesButton.addActionListener(e -> {
+			item.useItem();
+			if(Player.getItemReserves() == 0) itemReservesButton.setVisible(false);
+			setFocusable(true);  // Set the focus on the game panel
+			requestFocusInWindow(); // Request focus for the game panel
+		});
+		itemReservesButton.setPreferredSize(new Dimension(30, 30));
+		try {
+			Image img = ImageIO.read(getClass().getResource("resources/itemIcon.png"));
+			itemReservesButton.setIcon(new ImageIcon(img));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
 	}
 
 	@Override
@@ -390,7 +403,7 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	protected void addBkgImg(Graphics g) {
-		ImageIcon bkgImg = new ImageIcon("kr/ac/jbnu/se/tetris/image/background.jpg");
+		ImageIcon bkgImg = new ImageIcon("kr/ac/jbnu/se/tetris/resources/backGround.jpg");
 		Image bkgImg1 = bkgImg.getImage();
 		g.drawImage(bkgImg1, 0, 0, getWidth() / 2, getHeight(), this);
 	}

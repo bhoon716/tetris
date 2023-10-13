@@ -1,15 +1,13 @@
 package kr.ac.jbnu.se.tetris;
 
 import javax.sound.sampled.*;
-import javax.swing.JSlider;
-import javax.swing.event.*;
 
 import java.io.File;
 import java.io.IOException;
 
 public class Bgm {
     private Clip audioClip;
-    private String audioFilePath = "kr/ac/jbnu/se/tetris/bgm.wav";
+    private String audioFilePath = "kr/ac/jbnu/se/tetris/resources/bgm.wav";
     private FloatControl volumeControl; // 볼륨 조절 컨트롤
 
     public Bgm() {
