@@ -6,7 +6,7 @@ import javax.swing.*;
 public class Tetris extends JFrame {
     private AchievementList achievementList = new AchievementList();
     
-    private Player player = new Player("test", 0, 0, 0, achievementList);
+    private Player player = new Player("test", 0, 0, 0, 0, 1, achievementList);
     private String userId;
     private int bgmVolume = 100;
 
