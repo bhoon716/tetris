@@ -38,10 +38,9 @@ public class Board extends JPanel implements ActionListener {
 	protected int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
 	protected int combo = 0;
 	protected int score = 0;
-	protected String curStatus = "";
 	private String modeName = "";
 	protected JLabel scoreLabel = new JLabel("Score : " + score);
-	protected JLabel statusLabel = new JLabel(curStatus);
+	protected JLabel statusLabel = new JLabel();
 	protected JLabel comboLabel = new JLabel("Combo : " + combo);
 	protected JPanel statusPanel = new JPanel();
 	private JPanel nextPiecePanel = new JPanel();
@@ -49,14 +48,13 @@ public class Board extends JPanel implements ActionListener {
 	private JPanel holdBlockPanel = new JPanel();
 	private JPanel rightPanel = new JPanel();
 	private JButton backButton = new JButton("Back");
-	private JButton itemReservesButton = new JButton(String.valueOf(Player.getItemReserves()));
+	private JButton itemReservesButton;
 	private Item item = new Item(this);
 
 
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
 		this.modeName = modeName;
-		this.curStatus = modeName;
 		setBackground(Color.WHITE);
 		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
 		setPreferredSize(new Dimension(250, 400));
@@ -67,6 +65,8 @@ public class Board extends JPanel implements ActionListener {
 		bgm.setVolume(tetris.getBgmVolume());
 		bgm.play(); //배경음악 재생
 		timer.start(); //타이머 시작
+		statusLabel.setText(modeName);
+		itemReservesButton = new JButton(String.valueOf(tetris.getUserItemReserves()));
 		clearBoard(); //게임 보드를 초기화
 		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
 		start();
@@ -75,7 +75,7 @@ public class Board extends JPanel implements ActionListener {
 		statusPanel.setLayout(new FlowLayout());
 		add(statusPanel, BorderLayout.EAST);
 
-		nextPiecePanel.setPreferredSize(new Dimension(100, 120));
+		nextPiecePanel.setPreferredSize(new Dimension(100, 100));
 		nextPiecePanel.setBorder(BorderFactory.createTitledBorder(null, "Next Piece", TitledBorder.CENTER, 0, new Font("맑은 고딕", Font.BOLD, 15)));
 		nextPiecePanel.add(nextPieceLabel);
 
@@ -85,8 +85,8 @@ public class Board extends JPanel implements ActionListener {
 		statusPanel.add(rightPanel, BorderLayout.NORTH);
 		statusPanel.add(nextPiecePanel, BorderLayout.CENTER);
 		statusPanel.add(holdBlockPanel, BorderLayout.SOUTH);
-		statusPanel.add(backButton, BorderLayout.SOUTH);
-		if(Player.getItemReserves() > 0) statusPanel.add(itemReservesButton, BorderLayout.SOUTH);
+		// statusPanel.add(backButton, BorderLayout.SOUTH);
+		if(tetris.getUserItemReserves() > 0) statusPanel.add(itemReservesButton, BorderLayout.SOUTH);
 
 		rightPanel.setPreferredSize(new Dimension(150, 80));
 		rightPanel.setLayout(new BorderLayout());
@@ -94,20 +94,20 @@ public class Board extends JPanel implements ActionListener {
 		rightPanel.add(statusLabel, BorderLayout.NORTH);
 		rightPanel.add(scoreLabel, BorderLayout.CENTER);
 		rightPanel.add(comboLabel, BorderLayout.SOUTH);
-		backButton.setPreferredSize(new Dimension(100, 30));
-		backButton.setFocusable(false);
-		backButton.addActionListener(e -> backButtonListener());
+		// backButton.setPreferredSize(new Dimension(100, 30));
+		// backButton.setFocusable(false);
+		// backButton.addActionListener(e -> backButtonListener());
 		itemReservesButton.addActionListener(e -> {
-			if(curStatus.equals("Game Over")) return;
+			if(statusLabel.getText().equals("Game Over :(")) return;
 
 			item.useItem();
-			if(Player.getItemReserves() == 0) itemReservesButton.setVisible(false);
+			if(tetris.getUserItemReserves() == 0) itemReservesButton.setVisible(false);
 			setFocusable(true);  // Set the focus on the game panel
 			requestFocusInWindow(); // Request focus for the game panel
 		});
     
 		itemReservesButton.setFocusable(false);
-		itemReservesButton.setPreferredSize(new Dimension(50, 30));
+		itemReservesButton.setPreferredSize(new Dimension(100, 30));
     
 		try {
 			Image img = ImageIO.read(getClass().getResource("resources/itemIcon.png"));
@@ -139,7 +139,7 @@ public class Board extends JPanel implements ActionListener {
 		stopGame();
 		removePauseScreen();
 		calcGameExp();
-		Tetris.player.setLevel();
+		tetris.setUserLevel();
 		tetris.switchPanel(new MainMenu(tetris)); // 메인 메뉴 화면으로 전환
 	}
 
@@ -211,12 +211,12 @@ public class Board extends JPanel implements ActionListener {
 		isPaused = !isPaused; //게임이 일시정지되었음을 나타내는 변수를 반전
 		if (isPaused) { //게임이 일시정지되었다면
 			timer.stop(); //타이머 정지
-			curStatus = modeName + " (Paused)";
+			statusLabel.setText(modeName + " (Paused)");
 			bgm.stop();
 			pauseScreen();
 		} else { //게임이 일시정지되지 않았다면
 			timer.start(); //타이머 시작
-			curStatus = modeName;
+			statusLabel.setText(modeName);
 			bgm.play();
 		}
 		repaint(); //게임 보드를 다시 그림
@@ -225,7 +225,7 @@ public class Board extends JPanel implements ActionListener {
 	public void resume() {
 		pause();
 		timer.start();
-		curStatus = modeName;
+		statusLabel.setText(modeName);
 		bgm.play();
 		removePauseScreen();
 		setFocusable(true);  // Set the focus on the game panel
@@ -236,7 +236,7 @@ public class Board extends JPanel implements ActionListener {
 		int choice = JOptionPane.showConfirmDialog(this, "게임을 재시작하시겠습니까?", "게임 재시작 확인", JOptionPane.YES_NO_OPTION);
 		if (choice == JOptionPane.YES_OPTION) {
 			score = 0;
-			curStatus = modeName;
+			statusLabel.setText(modeName);
 			bgm.replay();
 			removePauseScreen();
 			isPaused = false;
@@ -279,7 +279,6 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	protected void updateScorePanel() {
-		statusLabel.setText(curStatus);
 		scoreLabel.setText("Score : " + score);
 		comboLabel.setText("Combo : " + combo);
 		nextPieceLabel.setIcon(getNextPieceImage());
@@ -350,7 +349,8 @@ public class Board extends JPanel implements ActionListener {
 		curY = BoardHeight - 1 + curPiece.minY(); //새로운 블록의 y좌표
 
 		if (!tryMove(curPiece, curX, curY)) { //새로운 위치로 블록을 이동할 수 없다면
-			curStatus = "Game Over";
+			statusLabel.setText("Game Over :(");
+			tetris.setUserMaxScore(score);
 			stopGame(); //게임 정지
 			setFocusable(false);
 		}
@@ -514,14 +514,17 @@ public class Board extends JPanel implements ActionListener {
 			});
 			restartButton.addActionListener(e -> restart());
 			helpButton.addActionListener(e -> helpScreen());
+			backButton.addActionListener(e -> backButtonListener());
 
 			resumeButton.setBounds(50, 200, 100, 30);
 			restartButton.setBounds(50, 250, 100, 30);
 			helpButton.setBounds(50, 300, 100, 30);
+			backButton.setBounds(50, 350, 100, 30);
 
 			dimPanel.add(pausedLabel);
 			dimPanel.add(resumeButton);
 			dimPanel.add(restartButton);
+			dimPanel.add(backButton);
 			dimPanel.add(helpButton);
 
 			layeredPane.add(dimPanel, JLayeredPane.PALETTE_LAYER);
@@ -531,23 +534,25 @@ public class Board extends JPanel implements ActionListener {
 
 	public void removePauseScreen() {
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
-		JLayeredPane layeredPane = topFrame.getLayeredPane();
-		Component[] components = layeredPane.getComponentsInLayer(JLayeredPane.PALETTE_LAYER);
-
-		for (Component component : components) {
-			if (component instanceof JPanel) {
-				JPanel panel = (JPanel) component;
-				panel.removeAll();
-				layeredPane.remove(panel);
+	
+		if (topFrame != null) {
+			JLayeredPane layeredPane = topFrame.getLayeredPane();
+			Component[] components = layeredPane.getComponentsInLayer(JLayeredPane.PALETTE_LAYER);
+	
+			for (Component component : components) {
+				if (component instanceof JPanel) {
+					JPanel panel = (JPanel) component;
+					panel.removeAll();
+					layeredPane.remove(panel);
+				}
 			}
+			layeredPane.validate();
 		}
-		layeredPane.validate();
-		layeredPane.repaint();
 	}
 
 	public void calcGameExp(){
 		int gameExp = this.score/10;
-		Tetris.player.setExp(gameExp + Tetris.player.getExp());
+		tetris.addUserExp(gameExp);
 	}
 
 	class TAdapter extends KeyAdapter {
@@ -585,7 +590,7 @@ public class Board extends JPanel implements ActionListener {
 				case 'i':
 				case 'I':
 					item.useItem();
-					if(Player.getItemReserves() == 0) itemReservesButton.setVisible(false);
+					if(tetris.getUserItemReserves() == 0) itemReservesButton.setVisible(false);
 					break; // 아이템 사용 (I)
 			}
 		}

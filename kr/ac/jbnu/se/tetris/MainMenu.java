@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class MainMenu extends JPanel {
+    private Tetris tetris;
+
     private JPanel topPanel = new JPanel(new BorderLayout());
     private JPanel centerPanel = new JPanel(new GridLayout(4, 1, 10, 10));
     private JPanel bottomPanel = new JPanel(new FlowLayout());
@@ -17,6 +19,7 @@ public class MainMenu extends JPanel {
     private JButton logoutButton = new JButton("로그아웃");
 
     public MainMenu(Tetris tetris) {
+        this.tetris = tetris;
         setLayout(new FlowLayout());
         setBackground(Color.WHITE);
 
@@ -26,7 +29,7 @@ public class MainMenu extends JPanel {
         title.setFont(new Font("맑은 고딕", Font.BOLD, 32));
 
         // 프로필 라벨
-        JLabel profileLabel = new JLabel("ID : " + tetris.getUserId() + " | Level : " + tetris.player.getLevel() + " | 최고 기록 : " + tetris.getUserMaxScore() + SwingConstants.CENTER);
+        JLabel profileLabel = new JLabel("ID : " + tetris.getUserId() + " | Level : " + tetris.player.getLevel() + " | 최고 기록 : " + tetris.getUserMaxScore(), SwingConstants.CENTER);
         profileLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
         
         // 상단 패널에 타이틀과 프로필 라벨 추가

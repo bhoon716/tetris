@@ -26,11 +26,19 @@ public class Player {
     }
 
     public int getMaxScore() {
-        return maxScore;
+        return this.maxScore;
+    }
+
+    public void setMaxScore(int score) {
+        if(score > maxScore) this.maxScore = score;
     }
 
     public int getMaxCombo() {
         return maxCombo;
+    }
+
+    public void setMaxCombo(int combo){
+        if(combo > maxCombo) this.maxCombo = combo;
     }
 
     public int getLevel() {
@@ -53,17 +61,9 @@ public class Player {
         this.userId = userId;
     }
 
-    public void setMaxScore(int maxScore) {
-        this.maxScore = maxScore;
-    }
-
-    public void setMaxCombo(int maxCombo) {
-        this.maxCombo = maxCombo;
-    }
-
     public void setLevel() {
         {
-            int calcLev = this.exp / 200;
+            int calcLev = this.exp / 100;
             if(calcLev > level - 1){
                 for(int i = calcLev + 1 - level; i > 0; i--) addItemReserves();
             }
@@ -83,26 +83,14 @@ public class Player {
                 case 4:
                     this.level = 5;
                     break;
-                case 5:
-                    this.level = 6;
-                    break;
-                case 6:
-                    this.level = 7;
-                    break;
-                case 7:
-                    this.level = 8;
-                    break;
-                case 8:
-                    this.level = 9;
-                    break;
                 default:
-                    this.level = 10;
+                    this.level = 6;
                     break;
             }
         }
     }
 
-    public void getExp(int exp) {
+    public void addExp(int exp) {
         this.exp += exp;
         setLevel();
     }
