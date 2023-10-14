@@ -82,6 +82,7 @@ public class Player {
                     break;
                 case 4:
                     this.level = 5;
+                    break;
                 default:
                     this.level = 6;
                     break;
