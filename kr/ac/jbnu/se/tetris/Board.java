@@ -49,7 +49,7 @@ public class Board extends JPanel implements ActionListener {
 	private JPanel holdBlockPanel = new JPanel();
 	private JPanel rightPanel = new JPanel();
 	private JButton backButton = new JButton("Back");
-	private JButton itemReservesButton = new JButton(Player.getItemReserves() + "개");
+	private JButton itemReservesButton = new JButton(String.valueOf(Player.getItemReserves()));
 	private Item item = new Item(this);
 
 
@@ -105,8 +105,10 @@ public class Board extends JPanel implements ActionListener {
 			setFocusable(true);  // Set the focus on the game panel
 			requestFocusInWindow(); // Request focus for the game panel
 		});
-		itemReservesButton.setPreferredSize(new Dimension(30, 30));
+    
 		itemReservesButton.setFocusable(false);
+		itemReservesButton.setPreferredSize(new Dimension(50, 30));
+    
 		try {
 			Image img = ImageIO.read(getClass().getResource("resources/itemIcon.png"));
 			itemReservesButton.setIcon(new ImageIcon(img));
@@ -473,6 +475,10 @@ public class Board extends JPanel implements ActionListener {
 						"스프린트: 40줄을 최대한 빠른 시간 안에 지우는 모드\n" +
 						"타임어택: 2분 동안 많은 줄을 제거하는 모드\n" +
 						"고스트: 고스트만 보이는 모드\n\n" +
+						"[아이템 설명 : 폭탄]\n" +
+						"I 버튼이나 폭탄 아이콘을 누르면 아이템을 사용할 수 있습니다.\n"+
+						"사용 시 해당 시점에 쌓인 블록의 수만큼 점수가 100점씩 추가됩니다.\n"+
+						"레벨이 1 올라갈 때마다 아이템을 1개씩 얻을 수 있습니다.\n\n" +
 						"[단축키]\n" +
 						"방향 키: 블록 회전\n" +
 						"ESC: 일시정지\n" +
@@ -576,6 +582,11 @@ public class Board extends JPanel implements ActionListener {
 				case 'D':
 					oneLineDown();
 					break; // 소프트 드롭 (D)
+				case 'i':
+				case 'I':
+					item.useItem();
+					if(Player.getItemReserves() == 0) itemReservesButton.setVisible(false);
+					break; // 아이템 사용 (I)
 			}
 		}
 	}
