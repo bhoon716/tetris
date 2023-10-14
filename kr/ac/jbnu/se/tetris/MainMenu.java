@@ -19,7 +19,6 @@ public class MainMenu extends JPanel {
     public MainMenu(Tetris tetris) {
         setLayout(new FlowLayout());
         setBackground(Color.WHITE);
-        
 
         // 타이틀 + 프로필 패널 (상단 패널)
         // 타이틀 라벨
@@ -27,7 +26,7 @@ public class MainMenu extends JPanel {
         title.setFont(new Font("맑은 고딕", Font.BOLD, 32));
 
         // 프로필 라벨
-        JLabel profileLabel = new JLabel("ID : " + tetris.getUserId() + " | 최고 기록 : " + tetris.getUserMaxScore(), SwingConstants.CENTER);
+        JLabel profileLabel = new JLabel("ID : " + tetris.getUserId() + " | 최고 기록 : " + tetris.getUserMaxScore() + " | Level :" + tetris.player.getLevel(), SwingConstants.CENTER);
         profileLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
         
         // 상단 패널에 타이틀과 프로필 라벨 추가
