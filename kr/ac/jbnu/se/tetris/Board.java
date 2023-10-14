@@ -38,10 +38,9 @@ public class Board extends JPanel implements ActionListener {
 	protected int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
 	protected int combo = 0;
 	protected int score = 0;
-	protected String curStatus = "";
 	private String modeName = "";
 	protected JLabel scoreLabel = new JLabel("Score : " + score);
-	protected JLabel statusLabel = new JLabel(curStatus);
+	protected JLabel statusLabel = new JLabel();
 	protected JLabel comboLabel = new JLabel("Combo : " + combo);
 	protected JPanel statusPanel = new JPanel();
 	private JPanel nextPiecePanel = new JPanel();
@@ -56,7 +55,6 @@ public class Board extends JPanel implements ActionListener {
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
 		this.modeName = modeName;
-		this.curStatus = modeName;
 		setBackground(Color.WHITE);
 		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
 		setPreferredSize(new Dimension(250, 400));
@@ -67,6 +65,7 @@ public class Board extends JPanel implements ActionListener {
 		bgm.setVolume(tetris.getBgmVolume());
 		bgm.play(); //배경음악 재생
 		timer.start(); //타이머 시작
+		statusLabel.setText(modeName);
 		clearBoard(); //게임 보드를 초기화
 		addKeyListener(new TAdapter()); //키보드 입력을 받을 수 있도록 설정
 		start();
@@ -98,7 +97,7 @@ public class Board extends JPanel implements ActionListener {
 		backButton.setFocusable(false);
 		backButton.addActionListener(e -> backButtonListener());
 		itemReservesButton.addActionListener(e -> {
-			if(curStatus.equals("Game Over")) return;
+			if(statusLabel.getText().equals("Game Over :(")) return;
 
 			item.useItem();
 			if(Player.getItemReserves() == 0) itemReservesButton.setVisible(false);
@@ -211,12 +210,12 @@ public class Board extends JPanel implements ActionListener {
 		isPaused = !isPaused; //게임이 일시정지되었음을 나타내는 변수를 반전
 		if (isPaused) { //게임이 일시정지되었다면
 			timer.stop(); //타이머 정지
-			curStatus = modeName + " (Paused)";
+			statusLabel.setText(modeName + " (Paused)");
 			bgm.stop();
 			pauseScreen();
 		} else { //게임이 일시정지되지 않았다면
 			timer.start(); //타이머 시작
-			curStatus = modeName;
+			statusLabel.setText(modeName);
 			bgm.play();
 		}
 		repaint(); //게임 보드를 다시 그림
@@ -225,7 +224,7 @@ public class Board extends JPanel implements ActionListener {
 	public void resume() {
 		pause();
 		timer.start();
-		curStatus = modeName;
+		statusLabel.setText(modeName);
 		bgm.play();
 		removePauseScreen();
 		setFocusable(true);  // Set the focus on the game panel
@@ -236,7 +235,7 @@ public class Board extends JPanel implements ActionListener {
 		int choice = JOptionPane.showConfirmDialog(this, "게임을 재시작하시겠습니까?", "게임 재시작 확인", JOptionPane.YES_NO_OPTION);
 		if (choice == JOptionPane.YES_OPTION) {
 			score = 0;
-			curStatus = modeName;
+			statusLabel.setText(modeName);
 			bgm.replay();
 			removePauseScreen();
 			isPaused = false;
@@ -279,7 +278,6 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	protected void updateScorePanel() {
-		statusLabel.setText(curStatus);
 		scoreLabel.setText("Score : " + score);
 		comboLabel.setText("Combo : " + combo);
 		nextPieceLabel.setIcon(getNextPieceImage());
@@ -350,7 +348,7 @@ public class Board extends JPanel implements ActionListener {
 		curY = BoardHeight - 1 + curPiece.minY(); //새로운 블록의 y좌표
 
 		if (!tryMove(curPiece, curX, curY)) { //새로운 위치로 블록을 이동할 수 없다면
-			curStatus = "Game Over";
+			statusLabel.setText("Game Over :(");
 			stopGame(); //게임 정지
 			setFocusable(false);
 		}

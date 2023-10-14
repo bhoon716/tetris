@@ -35,7 +35,6 @@ public class SprintMode extends Board{
     // 남은 줄을 출력하는 메소드
     @Override
     protected void updateScorePanel() {
-        statusLabel.setText(curStatus);
         scoreLabel.setText("남은 줄 : " + (LINE_TO_CLEAR - numLinesRemoved));
         comboLabel.setText("Combo : " + combo);
         nextPieceLabel.setIcon(getNextPieceImage());

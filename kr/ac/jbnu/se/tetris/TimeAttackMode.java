@@ -35,7 +35,6 @@ public class TimeAttackMode extends Board{
     // 제거한 줄을 출력하는 메소드
     @Override
     protected void updateScorePanel() {
-		statusLabel.setText(curStatus);
 		scoreLabel.setText("제거한 줄 : " + numLinesRemoved);
 		comboLabel.setText("Combo : " + combo);
         nextPieceLabel.setIcon(getNextPieceImage());
