@@ -49,11 +49,22 @@ public class Shape { //블록의 모양을 나타내는 클래스
 		return pieceShape;
 	}
 
-	public void setRandomShape() { //랜덤으로 블록의 모양을 설정하는 메소드
+	public String getShapeToString(){
+		return pieceShape.toString();
+	}
+
+	// public void setRandomShape() { //랜덤으로 블록의 모양을 설정하는 메소드
+	// 	Random r = new Random(); //랜덤 객체 생성
+	// 	int x = Math.abs(r.nextInt()) % 7 + 1; //1부터 7까지의 랜덤한 숫자를 생성
+	// 	Tetrominoes[] values = Tetrominoes.values(); //Tetrominoes 열거형의 모든 값들을 가져옴
+	// 	setShape(values[x]); //랜덤한 모양을 설정
+	// }
+
+	public String setRanShape(){
 		Random r = new Random(); //랜덤 객체 생성
 		int x = Math.abs(r.nextInt()) % 7 + 1; //1부터 7까지의 랜덤한 숫자를 생성
 		Tetrominoes[] values = Tetrominoes.values(); //Tetrominoes 열거형의 모든 값들을 가져옴
-		setShape(values[x]); //랜덤한 모양을 설정
+		return values[x].toString();
 	}
 		
 	public int minX() { //블록의 x좌표 중 가장 작은 값을 반환하는 메소드

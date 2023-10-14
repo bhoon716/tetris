@@ -32,23 +32,12 @@ public class SprintMode extends Board{
         }
     }
 
-    @Override
-	protected void newPiece() { //새로운 블록을 생성하는 메소드
-		curPiece.setRandomShape(); //새로운 블록의 모양을 랜덤으로 설정
-		curX = BoardWidth / 2; //새로운 블록의 x좌표
-		curY = BoardHeight - 1 + curPiece.minY(); //새로운 블록의 y좌표
-
-		if (!tryMove(curPiece, curX, curY)) { //새로운 위치로 블록을 이동할 수 없다면
-			curStatus = "Game Over";
-            stopGame();
-		}
-	}
-
     // 남은 줄을 출력하는 메소드
     @Override
     protected void updateScorePanel() {
         statusLabel.setText(curStatus);
         scoreLabel.setText("남은 줄 : " + (LINE_TO_CLEAR - numLinesRemoved));
         comboLabel.setText("Combo : " + combo);
+        nextPieceLabel.setIcon(getNextPieceImage());
     }
 }

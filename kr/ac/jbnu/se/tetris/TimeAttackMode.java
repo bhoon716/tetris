@@ -4,6 +4,7 @@ import javax.swing.*;
 
 public class TimeAttackMode extends Board{
     private final float TIME_LIMIT = 10.0f; // 타임어택 모드의 제한 시간
+
     private float remainingTime = TIME_LIMIT;
     private Timer taModetimer; // 타임어택 모드의 타이머
 
@@ -37,5 +38,16 @@ public class TimeAttackMode extends Board{
 		statusLabel.setText(curStatus);
 		scoreLabel.setText("제거한 줄 : " + numLinesRemoved);
 		comboLabel.setText("Combo : " + combo);
+        nextPieceLabel.setIcon(getNextPieceImage());
+	}
+
+    @Override
+	public void backButtonListener() {
+		stopGame();
+        taModetimer.stop();
+		removePauseScreen();
+		calcGameExp();
+		Tetris.player.setLevel();
+		tetris.switchPanel(new MainMenu(tetris)); // 메인 메뉴 화면으로 전환
 	}
 }
