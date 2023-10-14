@@ -2,25 +2,24 @@ package kr.ac.jbnu.se.tetris;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
+// import java.awt.image.BufferedImage;
+// import java.util.Scanner;
+// import java.util.concurrent.ExecutionException;
 import javax.swing.*;
 
 import static java.awt.event.KeyEvent.VK_ESCAPE;
 
 public class Board extends JPanel implements ActionListener {
 	private Tetris tetris;
-	protected Bgm bgm;
+	private Bgm bgm;
 
 	protected final int BoardWidth = 10; //게임 보드의 가로 칸 수
 	protected final int BoardHeight = 22; //게임 보드의 세로 칸 수
 
-	private Timer timer; //게임의 속도를 조절하는 타이머
-	protected long startTime; //게임 시작 시간을 저장하는 변수
+	protected Timer timer; //게임의 속도를 조절하는 타이머
 	protected boolean isFallingFinished = false; //현재 블록이 다 떨어졌는지 확인하는 변수
-	private boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
-	private boolean isPaused = false; //게임이 일시정지되었는지를 나타내는 변수
+	protected boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
+	protected boolean isPaused = false; //게임이 일시정지되었는지를 나타내는 변수
 	protected int numLinesRemoved = 0; //제거된 줄의 수를 나타내는 변수
 	protected int curX = 0; //현재 블록의 x좌표
 	protected int curY = 0; //현재 블록의 y좌표
@@ -154,12 +153,10 @@ public class Board extends JPanel implements ActionListener {
 		if (isPaused) //게임이 일시정지되었다면
 			return; //메소드 종료
 
-		startTime = System.currentTimeMillis(); //게임 시작 시간 기록
 		isStarted = true; //게임이 시작되었음을 나타내는 변수를 true로 설정
 		isFallingFinished = false; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 false로 설정
 		numLinesRemoved = 0; //제거된 줄의 수를 0으로 설정
 		clearBoard(); //게임 보드를 초기화
-		
 		newPiece(); //새로운 블록을 생성
 		timer.start(); //타이머 시작
 	}
@@ -267,7 +264,7 @@ public class Board extends JPanel implements ActionListener {
 			pieceDropped(); //블록을 한 칸 아래로 이동
 	}
 
-	private void clearBoard() { //게임 보드를 초기화하는 메소드s
+	protected void clearBoard() { //게임 보드를 초기화하는 메소드s
 		for (int i = 0; i < BoardHeight * BoardWidth; ++i) //게임 보드의 모든 칸에 대해
 			board[i] = Tetrominoes.NoShape; //칸의 모양을 NoShape(없음)으로 설정
 	}
@@ -367,10 +364,6 @@ public class Board extends JPanel implements ActionListener {
 			comboScore = 50 * combo;
 		}
 		score += 100 * numFullLines + comboScore;
-	}
-
-	public int getLineCount() {
-		return numLinesRemoved;
 	}
 
 	protected void drawSquare(Graphics g, int x, int y, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
