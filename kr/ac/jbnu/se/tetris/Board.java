@@ -2,9 +2,7 @@ package kr.ac.jbnu.se.tetris;
 
 import java.awt.*;
 import java.awt.event.*;
-// import java.awt.image.BufferedImage;
-// import java.util.Scanner;
-// import java.util.concurrent.ExecutionException;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import static java.awt.event.KeyEvent.VK_ESCAPE;
@@ -38,6 +36,9 @@ public class Board extends JPanel implements ActionListener {
 	private JPanel holdBlockPanel = new JPanel();
 	private JPanel rightPanel = new JPanel();
 	private JButton backButton = new JButton("Back");
+	private JButton itemReservesButton = new JButton(Player.getItemReserves() + "개");
+	private Item item = new Item(this);
+
 
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
@@ -71,6 +72,8 @@ public class Board extends JPanel implements ActionListener {
 		statusPanel.add(nextBlockPanel, BorderLayout.NORTH);
 		statusPanel.add(holdBlockPanel, BorderLayout.CENTER);
 		statusPanel.add(rightPanel, BorderLayout.SOUTH);
+		statusPanel.add(backButton, BorderLayout.SOUTH);
+		if(Player.getItemReserves() > 0) statusPanel.add(itemReservesButton, BorderLayout.SOUTH);
 
 		rightPanel.setPreferredSize(new Dimension(120, 50));
 		rightPanel.setLayout(new BorderLayout());
@@ -80,7 +83,19 @@ public class Board extends JPanel implements ActionListener {
 		rightPanel.add(comboLabel, BorderLayout.SOUTH);
 		backButton.setPreferredSize(new Dimension(100, 30));
 		backButton.addActionListener(e -> backButtonListener());
-		statusPanel.add(backButton, BorderLayout.SOUTH);
+		itemReservesButton.addActionListener(e -> {
+			item.useItem();
+			if(Player.getItemReserves() == 0) itemReservesButton.setVisible(false);
+			setFocusable(true);  // Set the focus on the game panel
+			requestFocusInWindow(); // Request focus for the game panel
+		});
+		itemReservesButton.setPreferredSize(new Dimension(30, 30));
+		try {
+			Image img = ImageIO.read(getClass().getResource("resources/itemIcon.png"));
+			itemReservesButton.setIcon(new ImageIcon(img));
+		} catch (Exception ex) {
+			System.out.println(ex);
+		}
 	}
 
 	@Override
@@ -97,11 +112,13 @@ public class Board extends JPanel implements ActionListener {
 	public void backButtonListener() {
 		bgm.stop(); //배경음악 정지
 		removePauseScreen();
+		calcGameExp();
+		Tetris.player.setLevel();
 		tetris.switchPanel(new MainMenu(tetris)); // 메인 메뉴 화면으로 전환
 	}
 
 	protected void drawGhost(Graphics g, int curX, int curY, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
-		if(curPiece.getShape() == Tetrominoes.NoShape)
+		if (curPiece.getShape() == Tetrominoes.NoShape)
 			return;
 
 		int newY = curY;
@@ -110,7 +127,7 @@ public class Board extends JPanel implements ActionListener {
 				break;
 			--newY;
 		}
-		for(int i=0; i<4; ++i){
+		for (int i = 0; i < 4; ++i) {
 			int x = curX + curPiece.getX(i);
 			int y = newY - curPiece.getY(i);
 			g.fillRect(0 + x * squareWidth(), boardTop + (BoardHeight - y - 1) * squareHeight(), squareWidth(), squareHeight());
@@ -192,19 +209,15 @@ public class Board extends JPanel implements ActionListener {
 	private void restart() {
 		int choice = JOptionPane.showConfirmDialog(this, "게임을 재시작하시겠습니까?", "게임 재시작 확인", JOptionPane.YES_NO_OPTION);
 		if (choice == JOptionPane.YES_OPTION) {
-			timer.start();
 			score = 0;
 			curStatus = modeName;
 			bgm.replay();
 			removePauseScreen();
+			isPaused = false;
 			start();
 			setFocusable(true);  // Set the focus on the game panel
 			requestFocusInWindow(); // Request focus for the game panel
-		} else {
-			removePauseScreen();
-			pause();
 		}
-		isPaused = false;
 	}
 
 	protected void stopGame() {
@@ -297,10 +310,10 @@ public class Board extends JPanel implements ActionListener {
 		for (int i = 0; i < 4; ++i) { //새로운 블록의 모든 칸에 대해
 			int x = newX + newPiece.getX(i); //새로운 블록의 x좌표
 			int y = newY - newPiece.getY(i); //새로운 블록의 y좌표
-			if((x < 0) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 왼쪽 벽을 넘어간다면
-				tryMove(newPiece, newX+1, newY); //새로운 블록을 오른쪽으로 한 칸 이동
-			if((x >= BoardWidth) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 오른쪽 벽을 넘어간다면
-				tryMove(newPiece, newX-1, newY); //새로운 블록을 왼쪽으로 한 칸 이동
+			if ((x < 0) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 왼쪽 벽을 넘어간다면
+				tryMove(newPiece, newX + 1, newY); //새로운 블록을 오른쪽으로 한 칸 이동
+			if ((x >= BoardWidth) && (y >= 0 || y <= BoardHeight)) //새로운 위치가 오른쪽 벽을 넘어간다면
+				tryMove(newPiece, newX - 1, newY); //새로운 블록을 왼쪽으로 한 칸 이동
 			if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) //새로운 블록이 게임 보드의 범위를 벗어난다면
 				return false; //false 반환
 			if (shapeAt(x, y) != Tetrominoes.NoShape) //새로운 블록이 게임 보드의 다른 블록과 겹친다면 = 새로운 x, y에 블록이 존재한다면
@@ -314,8 +327,8 @@ public class Board extends JPanel implements ActionListener {
 		return true; //true 반환
 	}
 
-	private boolean ghostTryMove(Shape newPiece, int newX, int newY){
-		for(int i=0; i<4; ++i){
+	private boolean ghostTryMove(Shape newPiece, int newX, int newY) {
+		for (int i = 0; i < 4; ++i) {
 			int x = newX + newPiece.getX(i); //새로운 블록의 x좌표
 			int y = newY - newPiece.getY(i); //새로운 블록의 y좌표
 			if (x < 0 || x >= BoardWidth || y < 0 || y >= BoardHeight) //새로운 블록이 게임 보드의 범위를 벗어난다면
@@ -386,7 +399,7 @@ public class Board extends JPanel implements ActionListener {
 	}
 
 	protected void addBkgImg(Graphics g) {
-		ImageIcon bkgImg = new ImageIcon("kr/ac/jbnu/se/tetris/image/background.jpg");
+		ImageIcon bkgImg = new ImageIcon("kr/ac/jbnu/se/tetris/resources/backGround.jpg");
 		Image bkgImg1 = bkgImg.getImage();
 		g.drawImage(bkgImg1, 0, 0, getWidth() / 2, getHeight(), this);
 	}
@@ -408,18 +421,19 @@ public class Board extends JPanel implements ActionListener {
 	public void helpScreen() {
 		String msg =
 				"다양한 난이도와 모드를 지원하는 테트리스 게임입니다.\n\n" +
-				"[모드 설명]\n" +
-				"스프린트: 40줄을 최대한 빠른 시간 안에 지우는 모드\n" +
-				"타임어택: 2분 동안 많은 줄을 제거하는 모드\n" +
-				"고스트: 고스트만 보이는 모드\n\n" +
-				"[단축키]\n" +
-				"방향 키: 블록 회전\n" +
-				"ESC: 일시정지\n"+
-				"Space: 하드 드롭\n"+
-				"D: 소프트 드롭";
+						"[모드 설명]\n" +
+						"스프린트: 40줄을 최대한 빠른 시간 안에 지우는 모드\n" +
+						"타임어택: 2분 동안 많은 줄을 제거하는 모드\n" +
+						"고스트: 고스트만 보이는 모드\n\n" +
+						"[단축키]\n" +
+						"방향 키: 블록 회전\n" +
+						"ESC: 일시정지\n" +
+						"Space: 하드 드롭\n" +
+						"D: 소프트 드롭";
 
 		JOptionPane.showMessageDialog(this, msg, "도움말", JOptionPane.INFORMATION_MESSAGE);
 	}
+
 	public void pauseScreen() {
 		if (isPaused) {
 			JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
@@ -431,7 +445,7 @@ public class Board extends JPanel implements ActionListener {
 			dimPanel.setBounds(0, 0, (int) getSize().getWidth() / 2, (int) getSize().getHeight());
 
 			JLabel pausedLabel = new JLabel("PAUSED");
-			pausedLabel.setFont(new Font("배달의민족한나AirOTF", Font.BOLD | Font.ITALIC ,30));
+			pausedLabel.setFont(new Font("배달의민족한나AirOTF", Font.BOLD | Font.ITALIC, 30));
 			pausedLabel.setForeground(Color.WHITE);
 			pausedLabel.setHorizontalAlignment(JLabel.CENTER);
 			pausedLabel.setVerticalAlignment(JLabel.CENTER);
@@ -456,10 +470,11 @@ public class Board extends JPanel implements ActionListener {
 			dimPanel.add(restartButton);
 			dimPanel.add(helpButton);
 
-			layeredPane.add(dimPanel,JLayeredPane.PALETTE_LAYER);
+			layeredPane.add(dimPanel, JLayeredPane.PALETTE_LAYER);
 		}
-		if(!isPaused) removePauseScreen();
+		if (!isPaused) removePauseScreen();
 	}
+
 	public void removePauseScreen() {
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 		JLayeredPane layeredPane = topFrame.getLayeredPane();
@@ -476,6 +491,10 @@ public class Board extends JPanel implements ActionListener {
 		layeredPane.repaint();
 	}
 
+	public void calcGameExp(){
+		int gameExp = this.score/10;
+		Tetris.player.setExp(gameExp + Tetris.player.getExp());
+	}
 
 	class TAdapter extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
