@@ -1,7 +1,6 @@
 package kr.ac.jbnu.se.tetris;
 
 import javax.sound.sampled.*;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -53,7 +52,7 @@ public class Bgm {
 
     // Bgm 클래스의 setVolume 메서드 수정
     public void setVolume(float volume) {
-        float gain = (-0.20f * volume) + 20.5f;
-        volumeControl.setValue(-gain);
+        float gain = (0.20f * volume) - 20.0f;
+        volumeControl.setValue(gain);
     }
 }

@@ -5,13 +5,13 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class AchievementMenu extends JPanel {
-    private Tetris tetris;
+    // private Tetris tetris;
     private AchievementList achievementList = new AchievementList();
     private JList<String> achievementJList = new JList<>(achievementList.getAchievement());
     private JButton backButton = new JButton("뒤로 가기");
 
     public AchievementMenu(Tetris tetris) {
-        this.tetris = tetris;
+        // this.tetris = tetris;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 

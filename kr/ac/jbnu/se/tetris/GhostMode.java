@@ -25,16 +25,4 @@ public class GhostMode extends Board {
         g.setColor(new Color(0, 0, 0, 0));
         g.drawRect(x, y, squareWidth(), squareHeight());
     }
-
-    @Override
-    protected void newPiece() {
-        curPiece.setRandomShape();
-        curX = BoardWidth / 2;
-        curY = BoardHeight - 1 + curPiece.minY();
-
-        if (!tryMove(curPiece, curX, curY)) {
-            curStatus = "Game Over";
-            stopGame();
-        }
-    }
 }
