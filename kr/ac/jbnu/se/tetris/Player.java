@@ -63,7 +63,7 @@ public class Player {
 
     public void setLevel() {
         {
-            int calcLev = this.exp / 100;
+            int calcLev = this.exp / 200;
             if(calcLev > level - 1){
                 for(int i = calcLev + 1 - level; i > 0; i--) addItemReserves();
             }
@@ -83,8 +83,20 @@ public class Player {
                 case 4:
                     this.level = 5;
                     break;
-                default:
+                case 5:
                     this.level = 6;
+                    break;
+                case 6:
+                    this.level = 7;
+                    break;
+                case 7:
+                    this.level = 8;
+                    break;
+                case 8:
+                    this.level = 9;
+                    break;
+                default:
+                    this.level = 10;
                     break;
             }
         }
