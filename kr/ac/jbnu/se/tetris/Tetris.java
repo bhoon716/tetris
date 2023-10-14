@@ -32,6 +32,38 @@ public class Tetris extends JFrame {
         return player.getMaxScore();
     }
 
+    public void setUserMaxScore(int score) {
+        player.setMaxScore(score);
+    }
+
+    public int getUserMaxCombo() {
+        return player.getMaxCombo();
+    }
+
+    public void setUserMaxCombo(int combo) {
+        player.setMaxCombo(combo);
+    }
+
+    public int getUserLevel() {
+        return player.getLevel();
+    }
+
+    public void setUserLevel(){
+        player.setLevel();
+    }
+
+    public int getUserExp() {
+        return player.getExp();
+    }
+
+    public void addUserExp(int exp) {
+        player.addExp(exp);
+    }
+
+    public int getUserItemReserves() {
+        return Player.getItemReserves();
+    }
+
     public void switchPanel(JPanel panel) {
         getContentPane().removeAll();
         getContentPane().add(panel);

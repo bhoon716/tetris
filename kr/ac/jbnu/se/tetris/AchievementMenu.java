@@ -5,15 +5,17 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class AchievementMenu extends JPanel {
-    // private Tetris tetris;
+    private Tetris tetris;
     private AchievementList achievementList = new AchievementList();
     private JList<String> achievementJList = new JList<>(achievementList.getAchievement());
     private JButton backButton = new JButton("뒤로 가기");
 
     public AchievementMenu(Tetris tetris) {
-        // this.tetris = tetris;
+        this.tetris = tetris;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
+        checkAchievement();
+        updateAchievementList();
 
         // 패널 상단의 업적 제목 레이블
         JLabel titleLabel = new JLabel("업적", SwingConstants.CENTER);
@@ -44,5 +46,24 @@ public class AchievementMenu extends JPanel {
                 tetris.switchPanel(new MainMenu(tetris));
             }
         });
+    }
+
+    // 업적 달성 여부 확인
+    public void checkAchievement() {
+        if(tetris.getUserMaxScore() >= 10000) achievementList.setAchievement(0, true);
+        if(tetris.getUserMaxScore() >= 50000) achievementList.setAchievement(1, true);
+        if(tetris.getUserMaxScore() >= 100000) achievementList.setAchievement(2, true);
+        if(tetris.getUserMaxScore() >= 200000) achievementList.setAchievement(3, true);
+        if(tetris.getUserMaxCombo() >= 10) achievementList.setAchievement(4, true);
+        if(tetris.getUserMaxCombo() >= 20) achievementList.setAchievement(5, true);
+        if(tetris.getUserMaxCombo() >= 30) achievementList.setAchievement(6, true);
+        if(tetris.getUserMaxCombo() >= 40) achievementList.setAchievement(7, true);
+        if(tetris.getUserLevel() >= 3) achievementList.setAchievement(8, true);
+        if(tetris.getUserLevel() >= 6) achievementList.setAchievement(9, true);
+    }
+
+    // 업적 목록 업데이트
+    public void updateAchievementList() {
+        achievementJList.setListData(achievementList.getAchievement());
     }
 }
