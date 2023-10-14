@@ -40,6 +40,7 @@ public class Board extends JPanel implements ActionListener {
 	private JButton itemReservesButton = new JButton(Player.getItemReserves() + "개");
 	private Item item = new Item(this);
 
+
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
 		this.modeName = modeName;
@@ -112,6 +113,8 @@ public class Board extends JPanel implements ActionListener {
 	public void backButtonListener() {
 		bgm.stop(); //배경음악 정지
 		removePauseScreen();
+		calcGameExp();
+		Tetris.player.setLevel();
 		tetris.switchPanel(new MainMenu(tetris)); // 메인 메뉴 화면으로 전환
 	}
 
@@ -495,6 +498,10 @@ public class Board extends JPanel implements ActionListener {
 		layeredPane.repaint();
 	}
 
+	public void calcGameExp(){
+		int gameExp = this.score/10;
+		Tetris.player.setExp(gameExp + Tetris.player.getExp());
+	}
 
 	class TAdapter extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
@@ -528,11 +535,6 @@ public class Board extends JPanel implements ActionListener {
 				case 'D':
 					oneLineDown();
 					break; // 소프트 드롭 (D)
-				case 'i':
-				case 'I':
-					Item item = new Item(Board.this);
-					item.useItem();
-					break; // 아이템 사용 (I)
 			}
 		}
 	}
