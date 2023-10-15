@@ -51,7 +51,7 @@ public class Board extends JPanel implements ActionListener {
 	private JPanel holdBlockPanel = new JPanel();
 	protected JLabel holdBlockLabel = new JLabel();
 	private JPanel rightPanel = new JPanel();
-	private JButton backButton = new JButton("Back");
+	private JButton backButton = new JButton("메인메뉴");
 	private JButton itemReservesButton;
 	private Item item = new Item(this);
 
@@ -392,6 +392,7 @@ public class Board extends JPanel implements ActionListener {
 			statusLabel.setText("Game Over :(");
 			tetris.setUserMaxScore(score);
 			stopGame(); //게임 정지
+			gameOverScreen();
 			setFocusable(false);
 		}
 	}
@@ -605,6 +606,41 @@ public class Board extends JPanel implements ActionListener {
 		}
 		if (!isPaused) removePauseScreen();
 	}
+
+	public void gameOverScreen() {
+		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+		JLayeredPane layeredPane = topFrame.getLayeredPane();
+
+		// Create a semi-transparent panel to dim the screen
+		JPanel dimPanel = new JPanel();
+		dimPanel.setBackground(new Color(0, 0, 0, 142));
+		dimPanel.setBounds(0, 0, (int) getSize().getWidth() / 2, (int) getSize().getHeight());
+		JLabel pausedLabel = new JLabel("GAME OVER");
+		pausedLabel.setFont(new Font("배달의민족한나AirOTF", Font.BOLD | Font.ITALIC, 30));
+		pausedLabel.setForeground(Color.WHITE);
+		pausedLabel.setHorizontalAlignment(JLabel.CENTER);
+		pausedLabel.setVerticalAlignment(JLabel.CENTER);
+
+		JButton restartButton = new JButton("다시 시작");
+		JButton helpButton = new JButton("도움말");
+
+		restartButton.addActionListener(e -> restart());
+		helpButton.addActionListener(e -> helpScreen());
+		backButton.addActionListener(e -> backButtonListener());
+
+		restartButton.setBounds(50, 250, 100, 30);
+		helpButton.setBounds(50, 300, 100, 30);
+		backButton.setBounds(50, 350, 100, 30);
+
+		dimPanel.add(pausedLabel);
+		dimPanel.add(restartButton);
+		dimPanel.add(backButton);
+		dimPanel.add(helpButton);
+
+		layeredPane.add(dimPanel, JLayeredPane.PALETTE_LAYER);
+	}
+
+
 
 	public void removePauseScreen() {
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
