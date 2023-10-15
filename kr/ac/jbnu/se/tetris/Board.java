@@ -59,20 +59,14 @@ public class Board extends JPanel implements ActionListener {
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
 		this.modeName = modeName;
-		setBackground(Color.WHITE);
+		// setBackground(Color.WHITE);
 		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
 		setPreferredSize(new Dimension(250, 400));
 		curPiece.setShape(setRanShape()); //현재 블록을 생성(NoShape)
 		nextPiece.setShape(setRanShape());
 		bgm = new Bgm();
 		timer = new Timer(getTimerDelay(modeName), this); //타이머 생성(400ms마다 actionPerformed()를 호출)
-		linetimer = new Timer(15000, new ActionListener() { //타이머 생성 15초마다 new ActionListener() 호출
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//타이머가 만료될 때 makeOneLine()를 호출
-				makeOneLine();
-			}
-		});
+		linetimer = new Timer(15000, e -> makeOneLine());
 		bgm.setVolume(tetris.getBgmVolume());
 		bgm.play(); //배경음악 재생
 		timer.start(); //타이머 시작
@@ -212,6 +206,7 @@ public class Board extends JPanel implements ActionListener {
 		isStarted = true; //게임이 시작되었음을 나타내는 변수를 true로 설정
 		isFallingFinished = false; //블록이 떨어지는 것이 끝났음을 나타내는 변수를 false로 설정
 		numLinesRemoved = 0; //제거된 줄의 수를 0으로 설정
+		holdBlock.setShape(Tetrominoes.NoShape);
 		clearBoard(); //게임 보드를 초기화
 		newPiece(); //새로운 블록을 생성
 		timer.start(); //타이머 시작
@@ -273,7 +268,7 @@ public class Board extends JPanel implements ActionListener {
 
 	public void paint(Graphics g) { //게임 보드를 그리는 메소드
 		super.paint(g); //부모 클래스의 paint()를 호출
-		// addBkgImg(g);
+		addBkgImg(g);
 		drawGridPattern(g);
 		drawGhost(g, curX, curY, curPiece.getShape());
 
@@ -623,6 +618,10 @@ public class Board extends JPanel implements ActionListener {
 
 		JButton restartButton = new JButton("다시 시작");
 		JButton helpButton = new JButton("도움말");
+
+		restartButton.setFocusable(false);
+		helpButton.setFocusable(false);
+		backButton.setFocusable(false);
 
 		restartButton.addActionListener(e -> restart());
 		helpButton.addActionListener(e -> helpScreen());
