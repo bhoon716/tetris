@@ -17,7 +17,7 @@ public class Tetris extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(false);
         setLayout(new BorderLayout());
-        add(new MainMenu(this));
+        add(new Login(this));
     }
 
     public void setUserId(String userId) {

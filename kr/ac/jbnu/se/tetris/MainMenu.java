@@ -3,6 +3,10 @@ package kr.ac.jbnu.se.tetris;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class MainMenu extends JPanel {
 
@@ -14,8 +18,11 @@ public class MainMenu extends JPanel {
     private JButton timeattackButton = new JButton("타임어택 모드");
     private JButton shadowModeButton = new JButton("고스트 모드");
     private JButton achievementButton = new JButton("업적 관리");
+    private JButton rankingButton = new JButton("랭킹");
     private JButton settingButton = new JButton("설정");
     private JButton logoutButton = new JButton("로그아웃");
+    
+
 
     public MainMenu(Tetris tetris) {
         setLayout(new FlowLayout());
@@ -29,7 +36,7 @@ public class MainMenu extends JPanel {
         // 프로필 라벨
         JLabel profileLabel = new JLabel("ID : " + tetris.getUserId() + " | Level : " + tetris.getUserLevel() + " | 최고 기록 : " + tetris.getUserMaxScore(), SwingConstants.CENTER);
         profileLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
-        
+        sendUserMaxScoreToServer();
         // 상단 패널에 타이틀과 프로필 라벨 추가
         topPanel.setBackground(Color.WHITE);
         topPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 10, 50));
@@ -37,7 +44,8 @@ public class MainMenu extends JPanel {
         topPanel.add(profileLabel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
 
-
+        
+        
         // 게임 모드 버튼 (중앙 패널)
         // 기본 모드 버튼(+ 팝업 메뉴)
         JPopupMenu difficultyPopupMenu = new JPopupMenu();
@@ -84,24 +92,30 @@ public class MainMenu extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
 
 
-        // 업적 관리, 설정, 로그아웃 버튼 (하단 패널)
+        // 업적 관리, 랭킹, 설정, 로그아웃 버튼 (하단 패널)
         // 업적 관리 버튼
         achievementButton.addActionListener(e -> {
             System.out.println("업적 관리 선택됨");
             tetris.switchPanel(new AchievementMenu(tetris));
-        }); bottomPanel.add(setStyledButton(achievementButton, 100, 40));
+        }); bottomPanel.add(setStyledButton(achievementButton, 75, 40));
+        
+        // 랭킹 버튼
+        rankingButton.addActionListener(e -> {
+            System.out.println("랭킹 선택됨");
+            tetris.switchPanel(new Ranking(tetris));
+        }); bottomPanel.add(setStyledButton(rankingButton, 75, 40));
 
         // 설정 버튼
         settingButton.addActionListener(e -> {
             System.out.println("설정 선택됨");
             tetris.switchPanel(new SettingMenu(tetris));
-        }); bottomPanel.add(setStyledButton(settingButton, 100, 40));
+        }); bottomPanel.add(setStyledButton(settingButton, 75, 40));
 
         // 로그아웃 버튼
         logoutButton.addActionListener(e -> {
             System.out.println("로그아웃 선택됨");
             tetris.switchPanel(new Login(tetris));
-        }); bottomPanel.add(setStyledButton(logoutButton, 100, 40));
+        }); bottomPanel.add(setStyledButton(logoutButton, 75, 40));
 
         // 하단 패널에 버튼 추가
         bottomPanel.setBackground(Color.WHITE);
@@ -116,5 +130,49 @@ public class MainMenu extends JPanel {
         button.setFont(new Font("맑은 고딕", Font.BOLD, 13));
         button.setFocusPainted(false);
         return button;
+    }
+    // 사용자 ID와 최고 점수를 올바르게 전달 백엔ㄷ
+    private void sendUserMaxScoreToServer() {
+        String userId = tetris.getUserId();
+        int maxScore = tetris.getUserMaxScore();
+
+        // Use the existing sendScoreToServer method to send the user's max score
+        boolean scoreSent = sendScoreToServer(userId, maxScore);
+
+        if (scoreSent) {
+            System.out.println("Max score sent to the server successfully.");
+        } else {
+            System.out.println("Failed to send max score to the server.");
+        }
+    }
+
+    // Existing method to send the score to the server
+    private boolean sendScoreToServer(String userId, int maxScore) {
+        try {
+            URL url = new URL("http://localhost:3000/score"); // Update with your server's endpoint URL
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            // JSON format for the request body
+            String jsonInputString = "{ \"user_id\": \"" + userId + "\", \"score\": " + maxScore + " }";
+            byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(input, 0, input.length);
+            }
+
+            // Response code verification
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 201) {
+                return true; // Score sent successfully
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return false; // Score sending failed
     }
 }
