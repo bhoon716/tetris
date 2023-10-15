@@ -13,7 +13,7 @@ public class Shape { //블록의 모양을 나타내는 클래스
 		setShape(Tetrominoes.NoShape); //블록의 모양을 NoShape(없음)으로 설정
 	}
 	public void setShape(Tetrominoes shape) { //블록의 모양을 설정하는 메소드
-		//블록의 상대적인 좌표를 나타내는 배열(NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape)
+		//블록의 상대적인 좌표를 나타내는 배열(NoShape, ZShape, SShape, LineShape, TShape, SquareShape, LShape, MirroredLShape, OneBlockShape)
 		coordsTable = new int[][][] { { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } },
 			{ { 0, -1 }, { 0, 0 }, { -1, 0 }, { -1, 1 } }, { { 0, -1 }, { 0, 0 }, { 1, 0 }, { 1, 1 } },
 			{ { 0, -1 }, { 0, 0 }, { 0, 1 }, { 0, 2 } }, { { -1, 0 }, { 0, 0 }, { 1, 0 }, { 0, 1 } },

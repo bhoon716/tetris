@@ -26,6 +26,7 @@ public class Board extends JPanel implements ActionListener {
 	private ImageIcon sShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/SShape.png");
 
 	protected Timer timer; //게임의 속도를 조절하는 타이머
+	protected Timer linetimer; //줄 생성 속도를 조절하는 타이머
 	protected boolean isFallingFinished = false; //현재 블록이 다 떨어졌는지 확인하는 변수
 	protected boolean isStarted = false; //게임이 시작되었는지를 나타내는 변수
 	protected boolean isPaused = false; //게임이 일시정지되었는지를 나타내는 변수
@@ -62,9 +63,17 @@ public class Board extends JPanel implements ActionListener {
 		nextPiece.setShape(setRanShape());
 		bgm = new Bgm();
 		timer = new Timer(getTimerDelay(modeName), this); //타이머 생성(400ms마다 actionPerformed()를 호출)
+		linetimer = new Timer(10000, new ActionListener() { //타이머 생성 10초마다 new ActionListener() 호출
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				//타이머가 만료될 때 makeOneLine()를 호출
+				makeOneLine();
+			}
+		});
 		bgm.setVolume(tetris.getBgmVolume());
 		bgm.play(); //배경음악 재생
 		timer.start(); //타이머 시작
+		linetimer.start(); //줄 생성 타이머 시작
 		statusLabel.setText(modeName);
 		itemReservesButton = new JButton(String.valueOf(tetris.getUserItemReserves()));
 		clearBoard(); //게임 보드를 초기화
@@ -202,6 +211,7 @@ public class Board extends JPanel implements ActionListener {
 		clearBoard(); //게임 보드를 초기화
 		newPiece(); //새로운 블록을 생성
 		timer.start(); //타이머 시작
+		linetimer.start();
 	}
 
 	private void pause() { //게임을 일시정지하는 메소드
@@ -211,11 +221,13 @@ public class Board extends JPanel implements ActionListener {
 		isPaused = !isPaused; //게임이 일시정지되었음을 나타내는 변수를 반전
 		if (isPaused) { //게임이 일시정지되었다면
 			timer.stop(); //타이머 정지
+			linetimer.stop();
 			statusLabel.setText(modeName + " (Paused)");
 			bgm.stop();
 			pauseScreen();
 		} else { //게임이 일시정지되지 않았다면
 			timer.start(); //타이머 시작
+			linetimer.start();
 			statusLabel.setText(modeName);
 			bgm.play();
 		}
@@ -225,6 +237,7 @@ public class Board extends JPanel implements ActionListener {
 	public void resume() {
 		pause();
 		timer.start();
+		linetimer.start();
 		statusLabel.setText(modeName);
 		bgm.play();
 		removePauseScreen();
@@ -250,6 +263,7 @@ public class Board extends JPanel implements ActionListener {
 		curPiece.setShape(Tetrominoes.NoShape); //현재 블록의 모양을 NoShape(없음)으로 설정
 		isStarted = false;
 		timer.stop(); //타이머 정지
+		linetimer.stop();
 		bgm.stop();
 	}
 
@@ -429,10 +443,30 @@ public class Board extends JPanel implements ActionListener {
 		score += 100 * numFullLines + comboScore;
 	}
 
+	public void makeOneLine() {
+
+		for (int k = BoardHeight -1; k > 0; --k) { // 위에서부터 시작
+			for (int j = 0; j < BoardWidth; ++j) { // 현재 줄의 모든 열에 대해
+				// 현재 줄을 한 줄 아래로 이동하면서 게임 보드의 블록 상태를 업데이트
+				board[(k * BoardWidth) + j] = shapeAt(j, k - 1);
+			}
+		}
+
+		for (int i = 0; i < BoardWidth; ++i) { // 맨 아랫줄 생성
+			board[(0 * BoardWidth) + i] =Tetrominoes.OneBlockShape;
+		}
+
+		Random random = new Random(); //맨 아랫줄 중 랜덤으로 한 칸을 비움
+		int randomNumber = random.nextInt(10);
+		board[(0 * BoardWidth) + randomNumber ] =Tetrominoes.NoShape;
+
+		repaint();
+	}
+
 	protected void drawSquare(Graphics g, int x, int y, Tetrominoes shape) { //x, y는 블록 왼쪽 상단의 좌표, shape는 블록의 모양
 		Color colors[] = {new Color(0, 0, 0), new Color(204, 102, 102), new Color(102, 204, 102), //색상 배열(RGB)
 				new Color(102, 102, 204), new Color(204, 204, 102), new Color(204, 102, 204), new Color(102, 204, 204),
-				new Color(218, 170, 0)};
+				new Color(218, 170, 0), new Color(128, 128, 128)};
 
 		Color color = colors[shape.ordinal()]; //블록의 모양에 따라 색상을 정함
 
