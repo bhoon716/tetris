@@ -34,7 +34,9 @@ public class Board extends JPanel implements ActionListener {
 	protected int curX = 0; //현재 블록의 x좌표
 	protected int curY = 0; //현재 블록의 y좌표
 	protected Shape curPiece = new Shape(); //현재 블록을 나타내는 객체
-	protected Shape nextPiece = new Shape();
+	protected Shape nextPiece = new Shape(); //다음 블록을 나타내는 객체
+	protected Shape holdBlock = new Shape(); //홀드 블록을 나타내는 객체
+	protected Shape empty = new Shape();
 	protected Tetrominoes[] board = new Tetrominoes[BoardWidth * BoardHeight]; //게임 보드를 나타내는 배열 생성
 	protected int boardTop = (int) getSize().getHeight() - BoardHeight * squareHeight(); //게임 보드의 상단 좌표
 	protected int combo = 0;
@@ -47,6 +49,7 @@ public class Board extends JPanel implements ActionListener {
 	private JPanel nextPiecePanel = new JPanel();
 	protected JLabel nextPieceLabel = new JLabel();
 	private JPanel holdBlockPanel = new JPanel();
+	protected JLabel holdBlockLabel = new JLabel();
 	private JPanel rightPanel = new JPanel();
 	private JButton backButton = new JButton("Back");
 	private JButton itemReservesButton;
@@ -63,7 +66,7 @@ public class Board extends JPanel implements ActionListener {
 		nextPiece.setShape(setRanShape());
 		bgm = new Bgm();
 		timer = new Timer(getTimerDelay(modeName), this); //타이머 생성(400ms마다 actionPerformed()를 호출)
-		linetimer = new Timer(10000, new ActionListener() { //타이머 생성 10초마다 new ActionListener() 호출
+		linetimer = new Timer(15000, new ActionListener() { //타이머 생성 15초마다 new ActionListener() 호출
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//타이머가 만료될 때 makeOneLine()를 호출
@@ -90,6 +93,7 @@ public class Board extends JPanel implements ActionListener {
 
 		holdBlockPanel.setPreferredSize(new Dimension(100, 100));
 		holdBlockPanel.setBorder(BorderFactory.createTitledBorder(null, "Hold Piece", TitledBorder.CENTER, 0, new Font("맑은 고딕", Font.BOLD, 15)));
+		holdBlockPanel.add(holdBlockLabel);
 
 		statusPanel.add(rightPanel, BorderLayout.NORTH);
 		statusPanel.add(nextPiecePanel, BorderLayout.CENTER);
@@ -296,10 +300,32 @@ public class Board extends JPanel implements ActionListener {
 		scoreLabel.setText("Score : " + score);
 		comboLabel.setText("Combo : " + combo);
 		nextPieceLabel.setIcon(getNextPieceImage());
+		holdBlockLabel.setIcon(getHoldBolckImage());
 	}
 
 	public ImageIcon getNextPieceImage(){
 		switch (nextPiece.getShape()){
+			case LineShape:
+				return lineShapeIamge;
+			case SquareShape:
+				return squareShapeIamge;
+			case TShape:
+				return tShapeIamge;
+			case LShape:
+				return lShapeIamge;
+			case MirroredLShape:
+				return mirroredLShapeIamge;
+			case ZShape:
+				return zShapeIamge;
+			case SShape:
+				return sShapeIamge;
+			default:
+				return null;
+		}
+	}
+
+	public ImageIcon getHoldBolckImage(){
+		switch (holdBlock.getShape()){
 			case LineShape:
 				return lineShapeIamge;
 			case SquareShape:
@@ -369,6 +395,20 @@ public class Board extends JPanel implements ActionListener {
 			setFocusable(false);
 		}
 	}
+
+	public void holdBlock() {
+		if (holdBlock.getShape() == Tetrominoes.NoShape) {
+			empty.setShape(curPiece.getShape());
+			curPiece.setShape(nextPiece.getShape());
+			holdBlock.setShape(empty.getShape());
+			nextPiece.setShape(setRanShape());
+		} else {
+			empty.setShape(curPiece.getShape());
+			curPiece.setShape(holdBlock.getShape());
+			holdBlock.setShape(empty.getShape());
+		}
+		repaint();
+		}
 
 	protected boolean tryMove(Shape newPiece, int newX, int newY) { //새로운 위치(newX, newY)로 블록을 이동하려고 시도하는 메소드
 		for (int i = 0; i < 4; ++i) { //새로운 블록의 모든 칸에 대해
@@ -443,7 +483,7 @@ public class Board extends JPanel implements ActionListener {
 		score += 100 * numFullLines + comboScore;
 	}
 
-	public void makeOneLine() {
+	public void makeOneLine() { //아래 줄 한 칸이 랜덤하게 비어있는 줄 생성
 
 		for (int k = BoardHeight -1; k > 0; --k) { // 위에서부터 시작
 			for (int j = 0; j < BoardWidth; ++j) { // 현재 줄의 모든 열에 대해
@@ -617,6 +657,9 @@ public class Board extends JPanel implements ActionListener {
 				case KeyEvent.VK_SPACE:
 					dropDown();
 					break; // 하드 드롭 (Space)
+				case 'c':
+				case 'C':
+					holdBlock(); // 홀드 기능 (c)
 				case 'd':
 				case 'D':
 					oneLineDown();
