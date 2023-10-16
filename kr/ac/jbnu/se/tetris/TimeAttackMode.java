@@ -3,7 +3,7 @@ package kr.ac.jbnu.se.tetris;
 import javax.swing.*;
 
 public class TimeAttackMode extends Board{
-    private final float TIME_LIMIT = 10.0f; // 타임어택 모드의 제한 시간
+    private final float TIME_LIMIT = 120.0f; // 타임어택 모드의 제한 시간
 
     private float remainingTime = TIME_LIMIT;
     private Timer taModetimer; // 타임어택 모드의 타이머
@@ -23,8 +23,7 @@ public class TimeAttackMode extends Board{
             stopGame();
             taModetimer.stop();
             JOptionPane.showMessageDialog(null, numLinesRemoved + "줄 제거!", "Time Over!", JOptionPane.INFORMATION_MESSAGE, null);
-            
-            // 최단 클리어 타임을 player 객체에 저장하는 코드 작성
+            gameOverScreen();
         }
         else {
             remainingTime -= 0.1f;

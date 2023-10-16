@@ -39,20 +39,20 @@ public class Login extends JPanel {
         loginPanel.add(loginIdField);
         loginPanel.add(loginPw);
         loginPanel.add(loginPwField);
-        loginPanel.add(loginButton);
-        loginPanel.add(signUpButton);
+        loginPanel.add(setStyledButton(loginButton));
+        loginPanel.add(setStyledButton(signUpButton));
 
         signUpPanel.setBorder(BorderFactory.createTitledBorder("회원가입"));
         signUpPanel.add(signUpId);
         signUpPanel.add(signUpIdField);
         signUpPanel.add(new JLabel()); // 빈 라벨
-        signUpPanel.add(checkDuplicateButton);
+        signUpPanel.add(setStyledButton(checkDuplicateButton));
         signUpPanel.add(signUpPw);
         signUpPanel.add(signUpPwField);
         signUpPanel.add(new JLabel("Password 확인 : "));
         signUpPanel.add(signUpConfirmPwField);
-        signUpPanel.add(submitButton);
-        signUpPanel.add(backButton);
+        signUpPanel.add(setStyledButton(submitButton));
+        signUpPanel.add(setStyledButton(backButton));
 
         signUpPanel.setVisible(false);
 
@@ -64,7 +64,7 @@ public class Login extends JPanel {
         backButton.addActionListener(e -> showLoginPanel());
     }
 
- // 로그인 로직
+     // 로그인 로직
     private void login() {
         String id = loginIdField.getText();
         char[] pw = loginPwField.getPassword();
@@ -236,5 +236,13 @@ public class Login extends JPanel {
         }
 
         return false; // 로그인 실패
+    }
+
+    private JButton setStyledButton(JButton button){
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("맑은 고딕", Font.BOLD, 13));
+        button.setFocusPainted(false);
+        return button;
     }
 }

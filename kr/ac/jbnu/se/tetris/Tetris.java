@@ -1,12 +1,17 @@
 package kr.ac.jbnu.se.tetris;
 
 import java.awt.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import javax.swing.*;
 
+
 public class Tetris extends JFrame {
-    private static AchievementList achievementList = new AchievementList();
     
-    public static Player player = new Player("test", 0, 0, 1, 0, 1, achievementList);
+    public static Player player = new Player("", 0, 1, 0, 3);
     private String userId;
 
     private int bgmVolume = 100;
@@ -34,14 +39,6 @@ public class Tetris extends JFrame {
 
     public void setUserMaxScore(int score) {
         player.setMaxScore(score);
-    }
-
-    public int getUserMaxCombo() {
-        return player.getMaxCombo();
-    }
-
-    public void setUserMaxCombo(int combo) {
-        player.setMaxCombo(combo);
     }
 
     public int getUserLevel() {

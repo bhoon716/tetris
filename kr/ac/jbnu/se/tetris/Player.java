@@ -3,22 +3,17 @@ package kr.ac.jbnu.se.tetris;
 //현제 플레이어의 정보를 저장하는 클래스
 public class Player {
     private String userId = "";
-    private int maxScore = 0;
-    private int maxCombo = 0;
-    private int level = 1;
+    private int maxScore;
+    private int level;
     private int exp = 0;
     private static int itemReserves = 3;
-    private AchievementList achievementList;
-
     
-    public Player(String userId, int maxScore, int maxCombo, int level, int exp, int itemReserves, AchievementList achievementList) {
+    public Player(String userId, int maxScore, int level, int exp, int itemReserves) {
         this.userId = userId;
         this.maxScore = maxScore;
-        this.maxCombo = maxCombo;
         this.level = level;
         this.exp = exp;
         this.itemReserves = itemReserves;
-        this.achievementList = achievementList;
     }
 
     public String getUserId() {
@@ -33,14 +28,6 @@ public class Player {
         if(score > maxScore) this.maxScore = score;
     }
 
-    public int getMaxCombo() {
-        return maxCombo;
-    }
-
-    public void setMaxCombo(int combo){
-        if(combo > maxCombo) this.maxCombo = combo;
-    }
-
     public int getLevel() {
         return level;
     }
@@ -53,17 +40,13 @@ public class Player {
 
     public static void addItemReserves(){itemReserves++;}
 
-    public AchievementList getAchievementList() {
-        return achievementList;
-    }
-
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
     public void setLevel() {
         {
-            int calcLev = this.exp / 100;
+            int calcLev = this.exp / 300;
             if(calcLev > level - 1){
                 for(int i = calcLev + 1 - level; i > 0; i--) addItemReserves();
             }
@@ -99,20 +82,9 @@ public class Player {
 
     public void setItemReserves(int itemReserves) { this.itemReserves = itemReserves; }
 
-
-    public void setAchievementList(AchievementList achievementList) {
-        this.achievementList = achievementList;
-    }
-
     public void updateMaxScore(int score) {
         if (score > maxScore) {
             maxScore = score;
-        }
-    }
-
-    public void updateMaxCombo(int combo) {
-        if (combo > maxCombo) {
-            maxCombo = combo;
         }
     }
 }

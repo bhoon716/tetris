@@ -43,8 +43,24 @@ public class SettingMenu extends JPanel {
         panel.setLayout(new GridLayout(3, 1));
         panel.add(volumeLabel);
         panel.add(volumeSlider);
-        panel.add(saveButton);
+        panel.add(setStyledButton(saveButton));
 
-        add(panel, BorderLayout.CENTER);
+        add(panel);
+
+        // 로그아웃 버튼
+        JButton logoutButton = new JButton("로그아웃");
+        logoutButton.setPreferredSize(new Dimension(200, 50));
+        logoutButton.addActionListener(e -> {
+            System.out.println("로그아웃 선택됨");
+            tetris.switchPanel(new Login(tetris));
+        }); add(setStyledButton(logoutButton));
+    }
+
+    private JButton setStyledButton(JButton button){
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("맑은 고딕", Font.BOLD, 13));
+        button.setFocusPainted(false);
+        return button;
     }
 }
