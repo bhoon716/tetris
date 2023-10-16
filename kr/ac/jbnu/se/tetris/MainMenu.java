@@ -3,12 +3,14 @@ package kr.ac.jbnu.se.tetris;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainMenu extends JPanel {
+    private Tetris tetris;
 
     private JPanel topPanel = new JPanel(new BorderLayout());
     private JPanel centerPanel = new JPanel(new GridLayout(4, 1, 10, 10));
@@ -17,14 +19,13 @@ public class MainMenu extends JPanel {
     private JButton sprintButton = new JButton("스프린트 모드");
     private JButton timeattackButton = new JButton("타임어택 모드");
     private JButton shadowModeButton = new JButton("고스트 모드");
-    private JButton achievementButton = new JButton("업적 관리");
+    private JButton achievementButton = new JButton("업적");
     private JButton rankingButton = new JButton("랭킹");
     private JButton settingButton = new JButton("설정");
     private JButton logoutButton = new JButton("로그아웃");
-    
-
 
     public MainMenu(Tetris tetris) {
+        this.tetris = tetris;
         setLayout(new FlowLayout());
         setBackground(Color.WHITE);
 
@@ -37,6 +38,7 @@ public class MainMenu extends JPanel {
         JLabel profileLabel = new JLabel("ID : " + tetris.getUserId() + " | Level : " + tetris.getUserLevel() + " | 최고 기록 : " + tetris.getUserMaxScore(), SwingConstants.CENTER);
         profileLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
         sendUserMaxScoreToServer();
+
         // 상단 패널에 타이틀과 프로필 라벨 추가
         topPanel.setBackground(Color.WHITE);
         topPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 10, 50));
@@ -44,8 +46,7 @@ public class MainMenu extends JPanel {
         topPanel.add(profileLabel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
 
-        
-        
+
         // 게임 모드 버튼 (중앙 패널)
         // 기본 모드 버튼(+ 팝업 메뉴)
         JPopupMenu difficultyPopupMenu = new JPopupMenu();
@@ -111,12 +112,6 @@ public class MainMenu extends JPanel {
             tetris.switchPanel(new SettingMenu(tetris));
         }); bottomPanel.add(setStyledButton(settingButton, 75, 40));
 
-        // 로그아웃 버튼
-        logoutButton.addActionListener(e -> {
-            System.out.println("로그아웃 선택됨");
-            tetris.switchPanel(new Login(tetris));
-        }); bottomPanel.add(setStyledButton(logoutButton, 75, 40));
-
         // 하단 패널에 버튼 추가
         bottomPanel.setBackground(Color.WHITE);
         bottomPanel.setPreferredSize(new Dimension(350, 60));
@@ -131,6 +126,7 @@ public class MainMenu extends JPanel {
         button.setFocusPainted(false);
         return button;
     }
+
     // 사용자 ID와 최고 점수를 올바르게 전달 백엔ㄷ
     private void sendUserMaxScoreToServer() {
         String userId = tetris.getUserId();

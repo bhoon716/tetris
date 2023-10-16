@@ -23,8 +23,7 @@ public class SprintMode extends Board{
             spModeTimer.stop();
             String clearTime = String.format("Clear Time - %.1f 초", runningTime); // 클리어 타임을 xx.yy 초 형식으로 저장
             JOptionPane.showMessageDialog(null, clearTime,"Game Clear!", JOptionPane.INFORMATION_MESSAGE, null);
-            
-            // 최단 클리어 타임을 player 객체에 저장하는 코드 작성
+            gameOverScreen();
         }
         else{
             runningTime += 0.1f;

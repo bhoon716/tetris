@@ -17,13 +17,13 @@ public class Board extends JPanel implements ActionListener {
 	protected final int BoardWidth = 10; //게임 보드의 가로 칸 수
 	protected final int BoardHeight = 22; //게임 보드의 세로 칸 수
 
-	private ImageIcon lineShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/LineShape.png");
-	private ImageIcon squareShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/SquareShape.png");
-	private ImageIcon tShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/TShape.png");
-	private ImageIcon lShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/LShape.png");
-	private ImageIcon mirroredLShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/MirroredLShape.png");
-	private ImageIcon zShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/ZShape.png");
-	private ImageIcon sShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/SShape.png");
+	final private ImageIcon lineShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/LineShape.png");
+	final private ImageIcon squareShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/SquareShape.png");
+	final private ImageIcon tShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/TShape.png");
+	final private ImageIcon lShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/LShape.png");
+	final private ImageIcon mirroredLShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/MirroredLShape.png");
+	final private ImageIcon zShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/ZShape.png");
+	final private ImageIcon sShapeIamge = new ImageIcon("kr/ac/jbnu/se/tetris/resources/SShape.png");
 
 	protected Timer timer; //게임의 속도를 조절하는 타이머
 	protected Timer linetimer; //줄 생성 속도를 조절하는 타이머
@@ -92,7 +92,6 @@ public class Board extends JPanel implements ActionListener {
 		statusPanel.add(rightPanel, BorderLayout.NORTH);
 		statusPanel.add(nextPiecePanel, BorderLayout.CENTER);
 		statusPanel.add(holdBlockPanel, BorderLayout.SOUTH);
-		// statusPanel.add(backButton, BorderLayout.SOUTH);
 		if(tetris.getUserItemReserves() > 0) statusPanel.add(itemReservesButton, BorderLayout.SOUTH);
 
 		rightPanel.setPreferredSize(new Dimension(150, 80));
@@ -101,9 +100,6 @@ public class Board extends JPanel implements ActionListener {
 		rightPanel.add(statusLabel, BorderLayout.NORTH);
 		rightPanel.add(scoreLabel, BorderLayout.CENTER);
 		rightPanel.add(comboLabel, BorderLayout.SOUTH);
-		// backButton.setPreferredSize(new Dimension(100, 30));
-		// backButton.setFocusable(false);
-		// backButton.addActionListener(e -> backButtonListener());
 		itemReservesButton.addActionListener(e -> {
 			if(statusLabel.getText().equals("Game Over :(")) return;
 
@@ -476,7 +472,7 @@ public class Board extends JPanel implements ActionListener {
 		if (combo > 1) {
 			comboScore = 50 * combo;
 		}
-		score += 100 * numFullLines + comboScore;
+		score += 10000 * numFullLines + comboScore;
 	}
 
 	public void makeOneLine() { //아래 줄 한 칸이 랜덤하게 비어있는 줄 생성
@@ -553,7 +549,8 @@ public class Board extends JPanel implements ActionListener {
 						"방향 키: 블록 회전\n" +
 						"ESC: 일시정지\n" +
 						"Space: 하드 드롭\n" +
-						"D: 소프트 드롭";
+						"D: 소프트 드롭\n" +
+						"C: 홀드";
 
 		JOptionPane.showMessageDialog(this, msg, "도움말", JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -638,8 +635,6 @@ public class Board extends JPanel implements ActionListener {
 
 		layeredPane.add(dimPanel, JLayeredPane.PALETTE_LAYER);
 	}
-
-
 
 	public void removePauseScreen() {
 		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);

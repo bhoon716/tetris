@@ -2,6 +2,7 @@ package kr.ac.jbnu.se.tetris;
 
 import javax.swing.*;
 
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -52,6 +53,9 @@ public class Ranking extends JPanel {
 
         // 뒤로 가기 버튼
         JButton backButton = new JButton("뒤로 가기");
+        backButton.setBackground(new Color(70, 130, 180));
+        backButton.setForeground(Color.WHITE);
+        backButton.setFont(new Font("맑은 고딕", Font.BOLD, 13));
         backButton.addActionListener(e -> {
             System.out.println("뒤로 가기 버튼 선택됨");
             tetris.switchPanel(new MainMenu(tetris));
@@ -97,7 +101,6 @@ public class Ranking extends JPanel {
             rankingList = null;
         }
     }
-
 
     private class RankingEntry {
         private String id;
