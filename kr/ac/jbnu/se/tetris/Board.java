@@ -59,7 +59,6 @@ public class Board extends JPanel implements ActionListener {
 	public Board(Tetris tetris, String modeName) {
 		this.tetris = tetris;
 		this.modeName = modeName;
-		// setBackground(Color.WHITE);
 		setLayout(new BorderLayout()); //보더 레이아웃으로 설정
 		setPreferredSize(new Dimension(250, 400));
 		curPiece.setShape(setRanShape()); //현재 블록을 생성(NoShape)
@@ -472,7 +471,7 @@ public class Board extends JPanel implements ActionListener {
 		if (combo > 1) {
 			comboScore = 50 * combo;
 		}
-		score += 10000 * numFullLines + comboScore;
+		score += 100 * numFullLines + comboScore;
 	}
 
 	public void makeOneLine() { //아래 줄 한 칸이 랜덤하게 비어있는 줄 생성

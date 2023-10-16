@@ -3,7 +3,7 @@ package kr.ac.jbnu.se.tetris;
 import javax.swing.*;
 
 public class SprintMode extends Board{
-    private final int LINE_TO_CLEAR = 1; // 스프린트 모드에서 클리어해야 하는 라인 수
+    private final int LINE_TO_CLEAR = 40; // 스프린트 모드에서 클리어해야 하는 라인 수
 
     private Timer spModeTimer; // 스프린트 모드의 타이머
     private float runningTime = 0;

@@ -7,10 +7,7 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
-<<<<<<< HEAD
-=======
 import java.io.InputStream;
->>>>>>> 208006a30a3883e8fce1516bfec2ce0bb7f4dd89
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -42,15 +39,11 @@ public class MainMenu extends JPanel {
         title.setFont(new Font("맑은 고딕", Font.BOLD, 32));
 
         // 프로필 라벨
-<<<<<<< HEAD
-        JLabel profileLabel = new JLabel("ID : " + tetris.getUserId() + " | Level : " + tetris.getUserLevel() + " | 최고 기록 : " + tetris.getUserMaxScore(), SwingConstants.CENTER);
-=======
         String userId = tetris.getUserId();
         int maxScore = getMaxScoreFromServer(userId); // 서버에서 최고 점수 가져오기
         
         // 프로필 라벨
         JLabel profileLabel = new JLabel("ID : " + userId + " | Level : " + tetris.player.getLevel() + " | 최고 기록 : " + maxScore, SwingConstants.CENTER);
->>>>>>> 208006a30a3883e8fce1516bfec2ce0bb7f4dd89
         profileLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
         sendUserMaxScoreToServer();
 

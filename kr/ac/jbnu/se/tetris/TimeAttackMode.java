@@ -3,7 +3,7 @@ package kr.ac.jbnu.se.tetris;
 import javax.swing.*;
 
 public class TimeAttackMode extends Board{
-    private final float TIME_LIMIT = 10.0f; // 타임어택 모드의 제한 시간
+    private final float TIME_LIMIT = 120.0f; // 타임어택 모드의 제한 시간
 
     private float remainingTime = TIME_LIMIT;
     private Timer taModetimer; // 타임어택 모드의 타이머
