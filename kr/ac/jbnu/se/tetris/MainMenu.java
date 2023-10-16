@@ -1,9 +1,16 @@
 package kr.ac.jbnu.se.tetris;
 
 import javax.swing.*;
+
+import org.json.JSONObject;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+<<<<<<< HEAD
+=======
+import java.io.InputStream;
+>>>>>>> 208006a30a3883e8fce1516bfec2ce0bb7f4dd89
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -35,7 +42,15 @@ public class MainMenu extends JPanel {
         title.setFont(new Font("맑은 고딕", Font.BOLD, 32));
 
         // 프로필 라벨
+<<<<<<< HEAD
         JLabel profileLabel = new JLabel("ID : " + tetris.getUserId() + " | Level : " + tetris.getUserLevel() + " | 최고 기록 : " + tetris.getUserMaxScore(), SwingConstants.CENTER);
+=======
+        String userId = tetris.getUserId();
+        int maxScore = getMaxScoreFromServer(userId); // 서버에서 최고 점수 가져오기
+        
+        // 프로필 라벨
+        JLabel profileLabel = new JLabel("ID : " + userId + " | Level : " + tetris.player.getLevel() + " | 최고 기록 : " + maxScore, SwingConstants.CENTER);
+>>>>>>> 208006a30a3883e8fce1516bfec2ce0bb7f4dd89
         profileLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
         sendUserMaxScoreToServer();
 
@@ -171,4 +186,36 @@ public class MainMenu extends JPanel {
 
         return false; // Score sending failed
     }
+    
+    private int getMaxScoreFromServer(String userId) {
+        try {
+            URL url = new URL("http://localhost:3000/showPanelMaxScore?user_id=" + userId); // 서버의 엔드포인트 URL로 업데이트
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            // 서버로부터 응답 받기
+            InputStream responseStream = connection.getInputStream();
+            // 응답 데이터를 문자열로 읽어오기
+            String responseData = new String(responseStream.readAllBytes());
+            responseStream.close();
+
+            // JSON 데이터 파싱
+            JSONObject jsonResponse = new JSONObject(responseData);
+
+            // 최고 점수 추출
+            int maxScore = jsonResponse.getInt("max_score");
+            return maxScore;
+
+        } catch (IOException e) {
+            // 서버 통신 오류 처리
+            e.printStackTrace();
+        } catch (Exception ex) {
+            // JSON 파싱 오류 처리
+            ex.printStackTrace();
+        }
+
+        return 0; // 요청 실패 시 기본값 반환
+    }
+
+    
 }
