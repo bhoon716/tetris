@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Random;
 
-public class Item{
+public class Item {
     public Board board;
     private Random random = new Random();
 
@@ -24,7 +24,7 @@ public class Item{
     // 점수를 추가하는 메소드
     private void addScore() {
         int blockCount = countBlocks() * 25;
-        board.score += blockCount; // 블록 수만큼 점수 추가
+        board.score += blockCount;
     }
 
     // 보드의 모든 블록을 제거하는 메소드
@@ -32,9 +32,8 @@ public class Item{
         for (int i = 0; i < board.BoardHeight * board.BoardWidth; ++i) {
             board.board[i] = Tetrominoes.NoShape;
         }
-
-        board.repaint(); // 게임 보드 다시 그리기
-        board.updateScorePanel(); // 스코어 패널 업데이트하기
+        board.repaint();
+        board.updateScorePanel();
     }
 
     // 현재 보드에 있는 블록 수를 세는 메소드
