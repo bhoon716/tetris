@@ -11,7 +11,7 @@ import javax.swing.*;
 
 public class Tetris extends JFrame {
     
-    public static Player player = new Player("", 0, 1, 0, 3);
+    public static Player player = new Player("", 0, 1, 0, 1);
     private String userId;
 
     private int bgmVolume = 100;
