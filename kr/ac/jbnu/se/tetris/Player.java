@@ -6,7 +6,7 @@ public class Player {
     private int maxScore;
     private int level;
     private int exp = 0;
-    private static int itemReserves = 3;
+    private static int itemReserves = 1;
     
     public Player(String userId, int maxScore, int level, int exp, int itemReserves) {
         this.userId = userId;
@@ -38,7 +38,7 @@ public class Player {
 
     public static void subItemReserves() { itemReserves--; }
 
-    public static void addItemReserves(){itemReserves++;}
+    public static void addItemReserves(){ itemReserves++; }
 
     public void setUserId(String userId) {
         this.userId = userId;
