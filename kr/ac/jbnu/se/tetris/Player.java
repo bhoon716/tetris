@@ -1,6 +1,6 @@
 package kr.ac.jbnu.se.tetris;
 
-//현제 플레이어의 정보를 저장하는 클래스
+//현재 플레이어의 정보를 저장하는 클래스
 public class Player {
     private String userId = "";
     private int maxScore;

@@ -1,19 +1,11 @@
 package kr.ac.jbnu.se.tetris;
 
 import java.awt.*;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import javax.swing.*;
-
 
 public class Tetris extends JFrame {
     
     public static Player player = new Player("", 0, 1, 0, 1);
-    private String userId;
-
     private int bgmVolume = 100;
 
     public Tetris() {
@@ -79,9 +71,9 @@ public class Tetris extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Tetris game = new Tetris();
-            game.setLocationRelativeTo(null);
-            game.setVisible(true);
+            Tetris tetris = new Tetris();
+            tetris.setLocationRelativeTo(null);
+            tetris.setVisible(true);
         });
     }
 }

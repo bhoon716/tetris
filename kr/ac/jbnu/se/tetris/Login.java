@@ -30,7 +30,6 @@ public class Login extends JPanel {
 
     public Login(Tetris tetris){
         this.tetris = tetris;
-
         add(loginPanel);
         add(signUpPanel);
 
