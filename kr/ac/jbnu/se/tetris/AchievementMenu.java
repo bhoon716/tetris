@@ -33,9 +33,9 @@ public class AchievementMenu extends JPanel {
         // 생성된 업적 목록을 스크롤 패널에 추가
         for (AchievementItem item : achievementList) {
             JLabel itemLabel = new JLabel(item.getName() + " : " + item.getDescription());
-            itemLabel.setBorder(BorderFactory.createLineBorder(new Color(70, 130, 180), 1)); // 보더 스타일 변경
-            itemLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16)); // 폰트 스타일 변경
-            itemLabel.setForeground(new Color(70, 130, 180)); // 폰트 색상 변경
+            itemLabel.setBorder(BorderFactory.createLineBorder(new Color(70, 130, 180), 1));
+            itemLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16)); 
+            itemLabel.setForeground(new Color(70, 130, 180));
             centerPanel.add(itemLabel);
         }
 
@@ -50,7 +50,7 @@ public class AchievementMenu extends JPanel {
         backButton.setForeground(Color.WHITE);
         backButton.setFont(new Font("맑은 고딕", Font.BOLD, 16));
         backButton.setFocusPainted(false);
-        backButton.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // 여백 추가
+        backButton.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         add(backButton, BorderLayout.SOUTH);
 
         backButton.addActionListener(new ActionListener() {
@@ -61,6 +61,7 @@ public class AchievementMenu extends JPanel {
         });
     }
 
+    // 업적 목록 생성
     public void setAchievement() {
         if (tetris.getUserMaxScore() >= 5000)
             achievementList.add(new AchievementItem("초보자", "최고 점수 5000점 달성"));
@@ -74,6 +75,7 @@ public class AchievementMenu extends JPanel {
             achievementList.add(new AchievementItem("전설", "최고 점수 250000점 달성"));
     }
 
+    // 업적 아이템 클래스
     private class AchievementItem {
         private String name;
         private String description;

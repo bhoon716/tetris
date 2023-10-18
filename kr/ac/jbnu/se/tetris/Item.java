@@ -1,12 +1,7 @@
 package kr.ac.jbnu.se.tetris;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.Random;
-
 public class Item{
     public Board board;
-    private Random random = new Random();
 
     public Item(Board board) {
         this.board = board;

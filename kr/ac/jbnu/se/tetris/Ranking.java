@@ -1,11 +1,8 @@
 package kr.ac.jbnu.se.tetris;
 
-import javax.swing.*;
-
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Ranking extends JPanel {
-    private Tetris tetris;
+    Tetris tetris;
     private List<RankingEntry> rankingList;
 
     public Ranking(Tetris tetris) {
