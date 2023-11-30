@@ -7,10 +7,13 @@ public class Tetris extends JFrame {
     
     public static Player player = new Player("", 0, 1, 0, 1);
     private int bgmVolume = 100;
-
+    // 게임 모드 정보를 유지할 멤버 변수 추가
+    private String currentGameMode;
+    
     public Tetris() {
         setSize(400, 400);
         setTitle("Tetris");
+        currentGameMode = "Easy";
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(false);
         setLayout(new BorderLayout());
@@ -75,5 +78,12 @@ public class Tetris extends JFrame {
             tetris.setLocationRelativeTo(null);
             tetris.setVisible(true);
         });
+    }
+    public String getCurrentGameMode() {
+        return currentGameMode;
+    }
+
+    public void setCurrentGameMode(String mode) {
+        currentGameMode = mode;
     }
 }

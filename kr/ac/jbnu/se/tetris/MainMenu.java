@@ -13,7 +13,8 @@ import java.nio.charset.StandardCharsets;
 
 public class MainMenu extends JPanel {
     private Tetris tetris;
-
+    private String currentGameMode;
+    
     private JPanel topPanel = new JPanel(new BorderLayout());
     private JPanel centerPanel = new JPanel(new GridLayout(4, 1, 10, 10));
     private JPanel bottomPanel = new JPanel(new FlowLayout());
@@ -27,6 +28,7 @@ public class MainMenu extends JPanel {
 
     public MainMenu(Tetris tetris) {
         this.tetris = tetris;
+        this.currentGameMode = tetris.getCurrentGameMode(); // 초기화
         setLayout(new FlowLayout());
         setBackground(Color.WHITE);
 
@@ -51,18 +53,21 @@ public class MainMenu extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
 
-        // 게임 모드 버튼 (중앙 패널)
+     // 게임 모드 버튼 (중앙 패널)
         JPopupMenu difficultyPopupMenu = new JPopupMenu();
         String[] difficulty = {"Easy", "Normal", "Hard", "Very Hard", "God"};
-        for(String diff : difficulty){
+        for (String diff : difficulty) {
             JMenuItem menuItem = new JMenuItem(diff);
-            menuItem.addActionListener(new ActionListener(){
+            menuItem.addActionListener(new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e){
-                    System.out.println("노말 모드(" + diff + ") 선택됨");
+                public void actionPerformed(ActionEvent e) {
+                    System.out.println("게임 모드(" + diff + ") 선택됨");
+                    currentGameMode = diff; // 선택된 모드를 설정
+                    tetris.setCurrentGameMode(diff); // Tetris 인스턴스에도 설정
                     tetris.switchPanel(new Board(tetris, diff));
                 }
-            }); difficultyPopupMenu.add(menuItem);
+            });
+            difficultyPopupMenu.add(menuItem);
         }
         normalModeButton.addActionListener(new ActionListener(){
             @Override
@@ -73,19 +78,19 @@ public class MainMenu extends JPanel {
 
         // 스프린트 모드 버튼
         sprintButton.addActionListener(e -> {
-            System.out.println("스프린트 모드 선택됨");
+            System.out.println("스프린트 모드 선택됨");          
             tetris.switchPanel(new SprintMode(tetris));
         }); centerPanel.add(setStyledButton(sprintButton, 200, 40));
 
         // 타임어택 모드 버튼
         timeattackButton.addActionListener(e -> {
-            System.out.println("타임어택 모드 선택됨");
+            System.out.println("타임어택 모드 선택됨");            
             tetris.switchPanel(new TimeAttackMode(tetris));
         }); centerPanel.add(setStyledButton(timeattackButton, 200, 50));
 
         // 그림자 모드 버튼
         ghostModeButton.addActionListener(e -> {
-            System.out.println("고스트 모드 선택됨");
+            System.out.println("고스트 모드 선택됨");          
             tetris.switchPanel(new GhostMode(tetris));
         }); centerPanel.add(setStyledButton(ghostModeButton, 200, 50));
 
@@ -135,7 +140,7 @@ public class MainMenu extends JPanel {
         int maxScore = tetris.getUserMaxScore();
 
         // Use the existing sendScoreToServer method to send the user's max score
-        boolean scoreSent = sendScoreToServer(userId, maxScore);
+        boolean scoreSent = sendScoreToServer(userId, maxScore, currentGameMode);
 
         if (scoreSent) {
             System.out.println("Max score sent to the server successfully.");
@@ -145,7 +150,7 @@ public class MainMenu extends JPanel {
     }
 
     // Existing method to send the score to the server
-    private boolean sendScoreToServer(String userId, int maxScore) {
+    private boolean sendScoreToServer(String userId, int maxScore, String currentGameMode) {
         try {
             URL url = new URL("http://localhost:3000/score"); // Update with your server's endpoint URL
 
@@ -154,8 +159,10 @@ public class MainMenu extends JPanel {
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setDoOutput(true);
 
-            // JSON format for the request body
-            String jsonInputString = "{ \"user_id\": \"" + userId + "\", \"score\": " + maxScore + " }";
+            // JSON format for the request body with game mode
+            // 클라이언트에서 score 엔드포인트 호출 시 mode 정보도 함께 보내기
+            String jsonInputString = "{ \"user_id\": \"" + userId + "\", \"score\": " + maxScore + ", \"mode\": \"" + currentGameMode + "\" }";
+
             byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
 
             try (OutputStream os = connection.getOutputStream()) {
@@ -173,6 +180,7 @@ public class MainMenu extends JPanel {
 
         return false; // Score sending failed
     }
+
     
     private int getMaxScoreFromServer(String userId) {
         try {
