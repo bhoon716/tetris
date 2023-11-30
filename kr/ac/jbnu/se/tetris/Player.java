@@ -25,8 +25,10 @@ public class Player {
     }
 
     public void setMaxScore(int score) {
-        if(score > maxScore) this.maxScore = score;
+        this.maxScore = score;
     }
+    
+    
 
     public int getLevel() {
         return level;
