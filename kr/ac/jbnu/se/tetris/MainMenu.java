@@ -109,7 +109,7 @@ public class MainMenu extends JPanel {
         // 랭킹 버튼
         rankingButton.addActionListener(e -> {
             System.out.println("랭킹 선택됨");
-            tetris.switchPanel(new Ranking(tetris));
+            tetris.switchPanel(new ModeSelection(tetris));
         }); bottomPanel.add(setStyledButton(rankingButton, 75, 40));
 
         // 설정 버튼

@@ -15,9 +15,11 @@ import java.util.List;
 public class Ranking extends JPanel {
     Tetris tetris;
     private List<RankingEntry> rankingList;
-
-    public Ranking(Tetris tetris) {
+    private String selectedMode; // 추가된 부분
+    
+    public Ranking(Tetris tetris, String selectedMode) {
         this.tetris = tetris;
+        this.selectedMode = selectedMode; // 추가된 부분
         setLayout(new BorderLayout());
 
         // 상단 패널
@@ -30,7 +32,7 @@ public class Ranking extends JPanel {
         centerPanel.setBackground(Color.WHITE);
 
         // 백엔드 서버로부터 랭킹 정보를 가져오는 코드
-        fetchRankingData(); // 백엔드 서버와 통신하여 데이터 가져오기
+        fetchRankingData(selectedMode); // 백엔드 서버와 통신하여 데이터 가져오기
 
         // 랭킹 정보를 표시
         if (rankingList != null) {
@@ -60,9 +62,9 @@ public class Ranking extends JPanel {
         add(backButton, BorderLayout.SOUTH);
     }
 
-    private void fetchRankingData() {
+    private void fetchRankingData(String selectedMode) {
         try {
-            URL url = new URL("http://localhost:3000/ranking"); // 랭킹 조회 엔드포인트 URL
+        	URL url = new URL("http://localhost:3000/ranking?mode=" + selectedMode); // 랭킹 조회 엔드포인트 URL
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
